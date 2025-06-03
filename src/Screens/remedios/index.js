@@ -1,0 +1,454 @@
+
+import styles from "../../styles/stylesRemedio";
+import color from "../../color/color";
+import axios from "axios";
+import {
+  Pressable, View,
+  Text,
+  Image,
+  FlatList,
+  Modal,
+  TextInput,
+  Alert
+} from "react-native";
+import { useEffect, useState } from "react";
+import * as ImagePicker from "expo-image-picker";
+import { ScrollView } from "react-native";
+import global from "../../../global";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+export default function Remedios() {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [carregamento, setCarregamento] = useState(false);
+  const [modalEditVisible, setModalEditVisible] = useState(false);
+  const [image, setImage] = useState(null);
+  const [pesquisa, onChangePesquisa] = useState('');
+  const [nome, onChangeNome] = useState('');
+  const [desc, onChangeDesc] = useState('');
+  const [horario, onChangeHoriro] = useState('');
+  const [dia, onChangeDia] = useState('');
+  const [remedios, setRemedios] = useState([]);
+  const [idUser, setIdUser] = useState(null)
+  const [isAlteracao, setIsAlteracao] = useState(false);
+  const [idRemedio, onChangeIdRemedio] = useState(null)
+  const id = null;
+
+    const navigation = useNavigation()
+  async function pickImage() {
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+      console.log(result)
+      setIsAlteracao(false)
+    }
+  }
+  function salvar() {
+
+    const Remedio = new FormData();
+    try{
+    if (image) {
+      if (image.startsWith("data:image")) {
+        const base64Data = image.split(',')[1];
+        Remedio.append("imagemRemedio", {
+          uri: `data:image/jpeg;base64,${base64Data}`,
+          name: `foto_remedio_${Date.now()}.jpg`,
+          type: 'image/jpeg'
+        });
+      } else if (image.startsWith("file://")) {
+        Remedio.append("imagemRemedio", {
+          uri: image,
+          name: image.split('/').pop() || `foto_remedio_${Date.now()}.jpg`,
+          type: 'image/jpeg'
+        });
+      }
+    }
+
+
+
+  
+
+
+  } catch (error) {
+    console.error('Erro completo:', error);
+    
+    if (error.response) {
+      console.error('Detalhes do erro:', {
+        status: error.response.status,
+        data: error.response.data,
+        headers: error.response.headers
+      });
+      Alert.alert("Erro", error.response.data.message || "Falha no cadastro");
+    } else {
+      Alert.alert("Erro", "Não foi possível conectar ao servidor");
+    }
+  }
+  
+  const data = {
+    nome: nome,
+    horario: horario,
+    desc: desc,
+    termino: '2000-10-10',
+  }
+  Object.entries({...data}).forEach(([key, value]) => {
+      Remedio.append(key, value);
+    });
+    
+  console.log(Remedio)
+    salvarBanco(Remedio)
+  }
+  async function salvarBanco(data) {
+    try {
+      
+
+
+    const resposta = await axios.post(`http://${global}:8000/api/remedio`, data, {
+        headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      transformRequest: (data) => data,
+      });
+
+          console.log('Resposta da API:', resposta);
+
+      listarRemedios();
+      setCarregamento(false)
+      setModalVisible(false)
+      console.log("remedio cadastrado"
+      )
+    } catch (error) {
+      console.log(error, '11')
+    }
+  }
+  async function listarRemedios() {
+    try {
+      console.log('id p user', idUser)
+      const resultados = await axios.get(`http://${global}:8000/api/remedio/${idUser}`);
+      setCarregamento(false)
+      
+      setRemedios(resultados.data);
+
+    } catch {
+      return error
+      console.log(error)
+    }
+  }
+  async function pesquisar() {
+    try{
+      if(pesquisa.length >0){
+        setCarregamento(true)
+        const resultados = await axios.get(`http://${global}:8000/api/remedioa/${pesquisa}`)
+        setRemedios(resultados.data)
+        setCarregamento(false)
+
+      }
+    }catch{
+      return error
+      console.log(error)
+    }
+  }
+  useEffect(() => {
+    const carregarIdUsuario = async () => {
+      try {
+        const id = await AsyncStorage.getItem('idUser');
+        console.log('ID recuperado do AsyncStorage:', id);
+        if (id) {
+          setIdUser(id);
+          await listarRemedios(); // Agora listarRemedios só é chamado após setIdUser
+        }
+      } catch (error) {
+        console.error('Erro ao carregar idUser:', error);
+      }
+    };
+    
+    carregarIdUsuario();
+  }, []);
+
+  const abrirModalEdit = (id) => {
+    const remedioSelecionado = remedios.find((r) => r.id === id);
+    console.log(remedioSelecionado)
+    setIsAlteracao(true)
+    setModalEditVisible(true)
+    onChangeNome(remedioSelecionado.nome);
+    onChangeDesc(remedioSelecionado.desc)
+    onChangeHoriro(remedioSelecionado.horario);
+    onChangeDia(remedioSelecionado.termino);
+    onChangeIdRemedio(remedioSelecionado.id);
+    setImage(remedioSelecionado.img)
+  }
+
+  const alterarRemedio = async () => {
+    const Remedio = new FormData();
+    try{
+   if (image) {
+  if (image.startsWith("data:image")) {
+    const base64Data = image.split(',')[1];
+    Remedio.append("imgRemedio", {
+      uri: `data:image/jpeg;base64,${base64Data}`,
+      name: `foto_remedio_${Date.now()}.jpg`,
+      type: 'image/jpeg'
+    });
+  } else if (image.startsWith("file://")) {
+    Remedio.append("imgRemedio", {
+      uri: image,
+      name: image.split('/').pop() || `foto_remedio_${Date.now()}.jpg`,
+      type: 'image/jpeg'
+    });
+  }
+}
+  } catch (error) {
+    console.error('Erro completo:', error);
+    
+    if (error.response) {
+      console.error('Detalhes do erro:', {
+        status: error.response.status,
+        data: error.response.data,
+        headers: error.response.headers
+      });
+      Alert.alert("Erro", error.response.data.message || "Falha no cadastro");
+    } else {
+      Alert.alert("Erro", "Não foi possível conectar ao servidor");
+    }
+  }
+  console.log(nome, desc, horario)
+  const data = {
+    nome: nome,
+    horario: horario,
+    desc: desc,
+    termino: '2000-10-10',
+  }
+  Object.entries({...data}).forEach(([key, value]) => {
+      Remedio.append(key, value);
+    });
+    console.log('id antes do update', idUser)
+
+
+    try{
+    const resposta = await axios.post(`http://${global}:8000/api/remedio/${idRemedio}`, Remedio, {
+        headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      transformRequest: (data) => data,
+      });
+
+          console.log('Resposta da API:', resposta);
+
+      listarRemedios();
+      setCarregamento(false)
+      setModalVisible(false)
+      console.log("remedio cadastrado"
+      )
+    } catch (error) {
+      console.log(error, '11')
+    }
+    
+  }
+
+  const excluirRemedio = async (id) => {
+    const resposta = axios.delete(`http://${global}:8000/api/remedio/${id}`);
+    
+    console.log(resposta)
+    listarRemedios();
+
+  }
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.titulo}>
+        <Pressable
+          style={styles.voltarContainer}
+          onPress={() => navigation.navigate("telaHome")}
+        >
+          <Image
+            source={require("../../../assets/setaEsquerda.png")}
+            style={styles.imgsetaVoltar}
+          />
+        </Pressable>
+        <Text style={styles.tituloText}>Remedios</Text>
+      </View>
+      <View style={styles.topo}>
+        <View style={styles.inputCont}>
+          <TextInput
+            style={styles.input}
+            placeholder="Nome do remedio"
+            onChangeText={text => onChangePesquisa(text)}
+          />
+        </View>
+        <Pressable style={styles.mais} onPress={() => pesquisar()}>
+          <Image
+            source={require("../../../assets/lupav.png")}
+            style={styles.lupa}
+          />
+        </Pressable>
+        <Pressable style={styles.mais} onPress={() => setModalVisible(true)}>
+          <Image
+            source={require("../../../assets/mais.png")}
+            style={styles.maisImg}
+          />
+        </Pressable>
+      </View>
+      <View style={styles.listaCard}>
+        <FlatList
+          style={styles.FlatList}
+          data={remedios}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <View style={styles.imgCardCont}> 
+                <Image
+                source={ { uri: `http://${global}:8000/img/users/fotosRemedios/${item.img}` } }
+                style={styles.imgCard}
+              />
+              </View>
+              <View style={styles.info}>
+                <Text style={styles.infoText}>Remédio: {item.nome}</Text>
+                <Text style={styles.infoText}>Hora de tomar: {item.horario}</Text>
+                <Text style={styles.infoText}>Descrição: {item.desc}</Text>
+              </View>
+              <View style={styles.acoes}>
+                <Pressable style={styles.acoesbutton} onPress={() => abrirModalEdit(item.id)}>
+                  <Image
+                    source={require("../../../assets/edit.png")}
+                    style={styles.acoesbuttonImg}
+                  />
+                </Pressable>
+
+                 <Pressable style={styles.acoesbutton} onPress={() => excluirRemedio(item.id)}>
+              <Image
+                source={require("../../../assets/mais.png")}
+                style={styles.acoesbuttonImg}
+              />
+            </Pressable> 
+              </View>
+            </View>
+          )} />
+      </View>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+      >
+        <View style={styles.ContModal}>
+          <View style={styles.modalView}>
+            <Pressable style={styles.fecharmodalcont} onPress={() => setModalVisible(false)}>
+              <Image
+
+                source={require("../../../assets/close.png")}
+                style={styles.x} />
+            </Pressable>
+            <View style={styles.boxcontimgModal}>
+              <View style={styles.contimgModal}>
+                <Image
+                  source={{ uri: image }}
+                  style={styles.imgModal} />
+              </View>
+            </View>
+            <View style={styles.Contcarregarimg}>
+              <Pressable style={styles.carregarimg} onPress={pickImage}>
+                <Text style={styles.textbuttonmodal}>Carregar imagem</Text>
+              </Pressable>
+            </View>
+            <View style={styles.inputsModal}>
+              <View style={styles.continputmodal}>
+                <Text style={styles.label}>Nome do remédio</Text>
+                <TextInput style={styles.inputmodal} onChangeText={text => onChangeNome(text)} />
+              </View>
+              <View style={styles.continputmodal}>
+                <Text style={styles.label}>Descrição</Text>
+                <TextInput style={styles.inputmodal} onChangeText={text => onChangeDesc(text)} />
+              </View>
+              <View style={styles.continputmodal}>
+                <Text style={styles.label}>Horario de consumo</Text>
+                <TextInput style={styles.inputmodal} onChangeText={text => onChangeHoriro(text)} />
+              </View>
+              <View style={styles.continputmodal}>
+                <Text style={styles.label}>Dias de consumo</Text>
+                <TextInput style={styles.inputmodal} onChangeText={text => onChangeDia(text)} />
+              </View>
+            </View>
+            <View style={styles.Contcarregarimg}>
+              <Pressable style={styles.carregarimg} onPress={() => salvar()}>
+                <Text style={styles.textbuttonmodal}>Salvar</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalEditVisible}
+      >
+        <View style={styles.ContModal}>
+          <View style={styles.modalView}>
+            <Pressable style={styles.fecharmodalcont} onPress={() => setModalEditVisible(false)}>
+              <Image
+
+                source={require("../../../assets/close.png")}
+                style={styles.x} />
+            </Pressable>
+            <View style={styles.boxcontimgModal}>
+              <View style={styles.contimgModal}>
+                <Image
+                  source={isAlteracao ? { uri: `http://${global}:8000/img/users/fotosRemedios/${image}` } : { uri : image }}
+                  style={styles.imgModal} />
+              </View>
+            </View>
+            <View style={styles.Contcarregarimg}>
+              <Pressable style={styles.carregarimg} onPress={pickImage}>
+                <Text style={styles.textbuttonmodal}>Carregar imagem</Text>
+              </Pressable>
+            </View>
+            <View style={styles.inputsModal}>
+              <View style={styles.continputmodal}>
+                <Text style={styles.label}>Nome do remédio</Text>
+                <TextInput style={styles.inputmodal} value={nome} onChangeText={text => onChangeNome(text)} />
+              </View>
+              <View style={styles.continputmodal}>
+                <Text style={styles.label}>Descrição</Text>
+                <TextInput style={styles.inputmodal} value={desc} onChangeText={text => onChangeDesc(text)} />
+              </View>
+              <View style={styles.continputmodal}>
+                <Text style={styles.label}>Horario de consumo</Text>
+                <TextInput style={styles.inputmodal} value={horario} onChangeText={text => onChangeHoriro(text)} />
+              </View>
+              <View style={styles.continputmodal}>
+                <Text style={styles.label}>Dias de consumo</Text>
+                <TextInput style={styles.inputmodal} value={dia} onChangeText={text => onChangeDia(text)} />
+              </View>
+            </View>
+            <View style={styles.Contcarregarimg}>
+              <Pressable style={styles.carregarimg} onPress={() => alterarRemedio()}>
+                <Text style={styles.textbuttonmodal}>Salvar</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+            <Modal
+              animationType="fade"
+              transparent={true}
+              visible={carregamento}
+              onRequestClose={() => {
+                window.alert('Modal has been closed.');
+              }}>
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0000006d' }}>
+                <View>
+      
+      
+      
+      
+                  <Image
+                    source={{ uri: 'https://www.simondecyrene.org/wp-content/themes/simon-de-cyrene/assets/images/loader.gif' }}
+                    style={{ width: 100, height: 100 }}
+                  />
+                </View>
+              </View>
+            </Modal>
+    </SafeAreaView>
+  );
+}

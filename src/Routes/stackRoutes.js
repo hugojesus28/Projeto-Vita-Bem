@@ -12,6 +12,8 @@ import Pressao from "../Screens/pressao";
 import Splash from "../Screens/splash/splash";
 import Agua from '../Screens/agua';
 import Glicemia from "../Screens/glicemia";
+import Remedios from '../Screens/remedios';
+
 
 const Stack = createNativeStackNavigator()
 
@@ -22,6 +24,11 @@ export default function StackRoutes(){
             <Stack.Navigator>
                 <Stack.Screen name="telaSplash" component={Splash}
                 options={{headerShown: false}}
+                />
+                <Stack.Screen
+                    name="remedios"
+                    component={Remedios}
+                    options={{ headerShown: false }}
                 />
                  <Stack.Screen name="telaHome" component={TabRoutes}
                 options={{headerShown: false}}
