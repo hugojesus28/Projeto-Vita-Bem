@@ -30,10 +30,9 @@ export default function Login() {
 
   useEffect(() => {
     if (mensagem) {
-      Alert.alert("Sucesso", mensagem);
       window.alert(mensagem)
     }
-  }, [mensagem]);
+  }, []);
 
   const logar = async () => {
     console.log('botao')
@@ -102,7 +101,7 @@ export default function Login() {
               onFocus={() => alterarFoco("senha")}
               onBlur={removerFoco} 
               onChangeText={setSenha}
-
+              secureTextEntry
             />
             <View style={styles.viewLabel}>
               <Text style={styles.label}>Confirmar Senha</Text>
@@ -116,7 +115,7 @@ export default function Login() {
               onFocus={() => alterarFoco("confirmSenha")}
               onBlur={removerFoco}
               onChangeText={setConfirmSenha}
-
+              secureTextEntry
             />
           </View>
 

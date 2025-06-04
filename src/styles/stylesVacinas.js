@@ -7,7 +7,7 @@ export default StyleSheet.create({
 container:{
     flex:1, 
     width: '100%',
-    backgroundColor: colors.primeira,
+    backgroundColor: colors.branco,
 },
 containerConteudo:{
     flex:1, 
@@ -15,12 +15,11 @@ containerConteudo:{
     
 },
 viewTitPagina:{
-    height: 250,
+    height: 30,
     width: '100%',
     flexDirection: 'colunm',
     alignItems:'center',
-    marginBottom: 20,
-    backgroundColor: colors.primeira
+    backgroundColor: colors.branco
 },
  titulo:{
         flexDirection:'row',
@@ -32,12 +31,11 @@ viewTitPagina:{
     voltarContainer:{
         width:30,
         marginLeft: 7,
-        height:25
+        height:25,
+        justifyContent:'center',
+        alignItems:'center',
     },
-    imgsetaVoltar:{
-        width:'100%',
-        height:'100%',
-    },
+ 
     tituloText:{
         fontSize:25,
         fontWeight:500,
@@ -45,23 +43,23 @@ viewTitPagina:{
 
     },
 viewCatVacinas:{
-    flex: 1,
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-around',
-    margin: 20
+    margin: 20,
+    height: 200,
 },
 boxCategoria:{
     width: '30%',
     flexDirection: 'colunm',
     alignItems: 'center',
     height: '100%',
-   
     padding:  6,
     borderRadius: 4,
     paddingTop: 15 ,
     elevation: 10,
-    backgroundColor: colors.branco
+    backgroundColor: colors.branco,
+    borderColor: colors.primeira,
 },
 
 infoCategoria:{
@@ -74,11 +72,9 @@ containerVacinas:{
     flex: 2,
     alignItems: 'center',
     width: '100%',
+    backgroundColor: colors.primeira,
     overflow: 'scroll',
-    borderTopStartRadius: 50,
-        borderTopStartRadius: 50,
-    borderTopEndRadius: 50,
-
+   height: '100%',
     backgroundColor: colors.branco
 },
 

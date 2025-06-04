@@ -5,6 +5,8 @@ import { Pressable, View, Text, Image, FlatList, Modal } from 'react-native';
 import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+
 export default function Vacina(){
 
     const [lista, setLista] = useState(vacinasBrasil)
@@ -75,12 +77,19 @@ export default function Vacina(){
                 
             <View style={styles.viewTitPagina}>
              <View style={styles.titulo}>
-                <Pressable  style={styles.voltarContainer} onPress={() => navigation.navigate("telaHome")}><Image source={require('../../../assets/setaEsquerda.png')} style={styles.imgsetaVoltar} /></Pressable>
-                <Text style={{color: color.branco, fontSize: 20, fontWeight: 600}}>Vacinas</Text>
+                <Pressable  style={styles.voltarContainer} onPress={() => navigation.goBack()}>
+                      <FontAwesome5 name="arrow-left" size={24} color={color.primeira} />
+                </Pressable>
+                <Text style={{color: color.primeira, fontSize: 20, fontWeight: 600}}>Vacinas</Text>
             
                 </View>
+            </View>
 
- <View style={styles.viewCatVacinas}>
+           
+            
+
+            <View style={styles.containerVacinas}>
+                <View style={styles.viewCatVacinas}>
                 <Pressable onPress={() => criarCategorias("infancia")} style={[styles.boxCategoria, styles.boxShadow , { borderWidth: bordaBox1}]}>
                 <View style={[styles.infoCategoria]}>
                     <Image source={require('../../../assets/garoto.png')}/>
@@ -104,12 +113,6 @@ export default function Vacina(){
                 </View>
                 </Pressable>
             </View>
-            </View>
-
-           
-            
-
-            <View style={styles.containerVacinas}>
                 <View style={styles.viewTitulo}>
                     <Text style={{fontSize: 17, fontWeight: 600, opacity: 0.7}}>{categoriaAtual === null ? 'TODAS VACINAS': categoriaAtual.toUpperCase()}</Text>
                     <Pressable onPress={() => criarCategorias(null)} style={styles.botaoRemoverCat}> 

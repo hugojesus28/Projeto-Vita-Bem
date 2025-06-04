@@ -24,7 +24,7 @@ const DropdownHipertenso = ({valueHipertenso, onChangeValor}) => {
         valueField="valorHipertenso"
         data={dadosHipertenso}
         placeholderStyle={{
-              color: '#999',
+              color: '#000',
               fontSize: 16,
               fontWeight: '400',
             }}

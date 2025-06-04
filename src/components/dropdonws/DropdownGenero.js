@@ -8,7 +8,7 @@ import Colors from "../../color/color";
 const dadosGenero = [
   { labelGenero: "Masculino", valorGenero: 'masculino' },
   { labelGenero: "Feminino", valorGenero: 'feminino' },
-  { labelGenero: "Prefiro Não Dizer", valorGenero: 'na' },
+  { labelGenero: "Não dizer", valorGenero: 'na' },
 ];
 
 const DropdownGenero = ({valueGenero, onChangeValor}) => {
@@ -21,19 +21,18 @@ const DropdownGenero = ({valueGenero, onChangeValor}) => {
         <View style={styles.viewLabel}>
         <Text style={styles.label}>Genero</Text>
         </View>
-       <View style={{width: '80%' ,borderRadius: 20,overflow: 'hidden', elevation: 5, marginBottom: 20, backgroundColor: color.branco }}>
   <Dropdown
     labelField="labelGenero"
     valueField="valorGenero"
     data={dadosGenero}
     placeholderStyle={{
-      color: '#999',
+      color: '#000',
       fontSize: 16,
       fontWeight: '400',
     }}
     itemContainerStyle={{
-              borderRadius: 10
-            }}
+      borderRadius: 10
+    }}
     selectedTextStyle={{
       color: '#000', 
       fontSize: 16,
@@ -57,7 +56,7 @@ const DropdownGenero = ({valueGenero, onChangeValor}) => {
     style={[
       styles.inputs,
       styles.boxShadowInput,
-      { borderRadius: 20, width: '100%', marginBottom: 0, padding: 0 },
+     
       isFocusGenero && { borderColor: 'red', borderWidth: 1 }
     ]}
     value={valueGenero}
@@ -69,7 +68,6 @@ const DropdownGenero = ({valueGenero, onChangeValor}) => {
       onChangeValor(item.valorGenero);
     }}
   />
-</View>
 
     </>
 );

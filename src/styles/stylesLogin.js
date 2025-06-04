@@ -22,7 +22,7 @@ viewFormulario1:{
     borderTopStartRadius: 20  
 },
 viewLogo: {
-    flex: 0.3,
+    flex: 0.2,
     width: '100%',
     alignItems: 'center',
 
@@ -32,6 +32,7 @@ imgLogo:{
     height: 170,
     objectFit: 'contain',
     top: '20px',
+
 },
 viewEtapasForms:{
     width: '100%',

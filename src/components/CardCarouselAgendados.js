@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 const { width } = Dimensions.get("window");
 
 const data = [
-    { id: "1", title: "Remedios", image: require("../../assets/remedio.png") }, // Local
+    { id: "1", title: "Remedios", image: require("../../assets/remedio.png"), caminho: 'remedios' }, // Local
     { id: "2", title: "Tomar agua", image: require("../../assets/garrafa-de-agua.png") },
   { id: "3", title: "Dicas p/ Dormir", image: require("../../assets/dormindo.png") },
   { id: "8", title: "Mensagens Motivacionais", image: require("../../assets/mensagens.png"), caminho: "telaVacinas" },

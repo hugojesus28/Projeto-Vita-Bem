@@ -12,6 +12,7 @@ import DropdownHipertenso from '../../components/dropdonws/DropdownHipertenso.js
 import DropdownComponent from '../../components/dropdonws/DropdownDiabetico.js';
 import global from '../../../global.js';
 import DateTimePicker from 'react-native-ui-datepicker';
+import DropdownGenero from '../../components/dropdonws/DropdownGenero.js';
   import dayjs from 'dayjs';
   import 'dayjs/locale/pt-br';
 
@@ -246,6 +247,7 @@ export default function Perfil() {
               </View>
               <TextInput style={[styles.inputs, styles.boxShadowInput, isFocus === 'senha' && styles.focusInput]}
                 onFocus={() => alterarFoco('senha')}
+                secureTextEntry
                 onChangeText={setSenha}
                 onBlur={removerFoco}
                 value={senha}
@@ -280,17 +282,13 @@ export default function Perfil() {
             </View>
             <View style={[styles.viewCampo, { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }]}>
               <View style={{ width: '45%', marginRight: 10, justifyContent: 'flex-end', alignItems: 'flex-end' }}>
-                <View style={styles.viewLabel}>
-                  <Text style={styles.label}>Genero</Text>
-                </View>
-                <TextInput style={[styles.inputsJuntos, styles.boxShadowInput, isFocus === 'genero' && styles.focusInput]}
-                  onFocus={() => alterarFoco('genero')}
-                  onBlur={removerFoco}
-                  onChangeText={setGenero}
-                  value={genero}
-                />
+                
+                <DropdownGenero
+                valueGenero={genero}
+               onChangeValor={(valor) =>  setGenero(valor)} />
+                
               </View>
-              <View style={{ width: '45%', marginLeft: 10 }}>
+              <View style={{ width: '45%', marginLeft: 10, justifyContent: 'flex-start', alignItems: 'center' }}>
                 <View style={styles.viewLabel}>
                   <Text style={styles.label}>Data Nasc.</Text>
                 </View>

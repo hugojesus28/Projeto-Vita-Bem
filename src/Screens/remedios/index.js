@@ -18,6 +18,9 @@ import global from "../../../global";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import DateTimePicker from '@react-native-community/datetimepicker';
+
 export default function Remedios() {
   const [modalVisible, setModalVisible] = useState(false);
   const [carregamento, setCarregamento] = useState(false);
@@ -32,6 +35,7 @@ export default function Remedios() {
   const [idUser, setIdUser] = useState(null)
   const [isAlteracao, setIsAlteracao] = useState(false);
   const [idRemedio, onChangeIdRemedio] = useState(null)
+  const [mostrarModalHorario, setMostrarModalHorario] = useState(false);
   const id = null;
 
     const navigation = useNavigation()
@@ -87,11 +91,13 @@ export default function Remedios() {
       Alert.alert("Erro", "Não foi possível conectar ao servidor");
     }
   }
-  
+  console.log(nome, desc, horario, dia, idUser)
   const data = {
     nome: nome,
     horario: horario,
     desc: desc,
+    dias: dia,
+    idUsuario: idUser,
     termino: '2000-10-10',
   }
   Object.entries({...data}).forEach(([key, value]) => {
@@ -113,9 +119,9 @@ export default function Remedios() {
       transformRequest: (data) => data,
       });
 
-          console.log('Resposta da API:', resposta);
+      console.log('Resposta da API:', resposta);
 
-      listarRemedios();
+      listarRemedios(idUser);
       setCarregamento(false)
       setModalVisible(false)
       console.log("remedio cadastrado"
@@ -124,13 +130,13 @@ export default function Remedios() {
       console.log(error, '11')
     }
   }
-  async function listarRemedios() {
+  async function listarRemedios(id) {
     try {
-      console.log('id p user', idUser)
-      const resultados = await axios.get(`http://${global}:8000/api/remedio/${idUser}`);
+      console.log('id p user', id)
+      const resultados = await axios.get(`http://${global}:8000/api/remedio/${id}`);
       setCarregamento(false)
       
-      setRemedios(resultados.data);
+      setRemedios(resultados.data.remedios);
 
     } catch {
       return error
@@ -157,8 +163,8 @@ export default function Remedios() {
         const id = await AsyncStorage.getItem('idUser');
         console.log('ID recuperado do AsyncStorage:', id);
         if (id) {
-          setIdUser(id);
-          await listarRemedios(); // Agora listarRemedios só é chamado após setIdUser
+          await setIdUser(id);
+          await listarRemedios(id); 
         }
       } catch (error) {
         console.error('Erro ao carregar idUser:', error);
@@ -174,11 +180,11 @@ export default function Remedios() {
     setIsAlteracao(true)
     setModalEditVisible(true)
     onChangeNome(remedioSelecionado.nome);
-    onChangeDesc(remedioSelecionado.desc)
+    onChangeDesc(remedioSelecionado.desc);
     onChangeHoriro(remedioSelecionado.horario);
     onChangeDia(remedioSelecionado.termino);
     onChangeIdRemedio(remedioSelecionado.id);
-    setImage(remedioSelecionado.img)
+    setImage(remedioSelecionado.img);
   }
 
   const alterarRemedio = async () => {
@@ -214,12 +220,14 @@ export default function Remedios() {
       Alert.alert("Erro", "Não foi possível conectar ao servidor");
     }
   }
-  console.log(nome, desc, horario)
+  console.log(nome, desc, horario, dia, idUser, idRemedio)
   const data = {
     nome: nome,
     horario: horario,
     desc: desc,
     termino: '2000-10-10',
+    dias: dia,
+    idUsuario: idUser
   }
   Object.entries({...data}).forEach(([key, value]) => {
       Remedio.append(key, value);
@@ -228,6 +236,7 @@ export default function Remedios() {
 
 
     try{
+      setCarregamento(true)
     const resposta = await axios.post(`http://${global}:8000/api/remedio/${idRemedio}`, Remedio, {
         headers: {
         'Content-Type': 'multipart/form-data',
@@ -237,9 +246,9 @@ export default function Remedios() {
 
           console.log('Resposta da API:', resposta);
 
-      listarRemedios();
+      listarRemedios(idUser);
       setCarregamento(false)
-      setModalVisible(false)
+      setModalEditVisible(false)
       console.log("remedio cadastrado"
       )
     } catch (error) {
@@ -255,17 +264,26 @@ export default function Remedios() {
     listarRemedios();
 
   }
+
+  const selecionarHorario = (event, dataSelecionada) => {
+    const novaData = dataSelecionada || new Date();
+    const dataFormatada = novaData.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+    onChangeHoriro(dataFormatada);
+    setMostrarModalHorario(false);
+  }
+
+  const pegarData = () =>{
+    setMostrarModalHorario(true);
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.titulo}>
         <Pressable
           style={styles.voltarContainer}
-          onPress={() => navigation.navigate("telaHome")}
+          onPress={() => navigation.goBack()}
         >
-          <Image
-            source={require("../../../assets/setaEsquerda.png")}
-            style={styles.imgsetaVoltar}
-          />
+
+          <FontAwesome5 name="arrow-left" size={24} color={color.primeira} />
         </Pressable>
         <Text style={styles.tituloText}>Remedios</Text>
       </View>
@@ -317,10 +335,12 @@ export default function Remedios() {
                 </Pressable>
 
                  <Pressable style={styles.acoesbutton} onPress={() => excluirRemedio(item.id)}>
-              <Image
-                source={require("../../../assets/mais.png")}
-                style={styles.acoesbuttonImg}
-              />
+                <FontAwesome5
+                  name="trash-alt"
+                  size={15}
+                  color={color.primeira}
+                  style={styles.acoesbuttonImg}
+                />
             </Pressable> 
               </View>
             </View>
@@ -361,10 +381,21 @@ export default function Remedios() {
                 <Text style={styles.label}>Descrição</Text>
                 <TextInput style={styles.inputmodal} onChangeText={text => onChangeDesc(text)} />
               </View>
-              <View style={styles.continputmodal}>
+              <Pressable onPress={() => pegarData()} style={styles.continputmodal}>
                 <Text style={styles.label}>Horario de consumo</Text>
-                <TextInput style={styles.inputmodal} onChangeText={text => onChangeHoriro(text)} />
+                <View style={[styles.inputmodal, {justifyContent: 'center'}]} >
+                  <Text style={{ color: '#000', paddingLeft: 10 }}>{horario || 'Selecione o horário'}</Text>
+                </View>
+              </Pressable> 
+              <View>
+              {mostrarModalHorario && (
+                <DateTimePicker mode="time"
+                  onChange={selecionarHorario}
+                  value={new Date()} 
+                />
+              )}
               </View>
+             
               <View style={styles.continputmodal}>
                 <Text style={styles.label}>Dias de consumo</Text>
                 <TextInput style={styles.inputmodal} onChangeText={text => onChangeDia(text)} />
@@ -387,7 +418,6 @@ export default function Remedios() {
           <View style={styles.modalView}>
             <Pressable style={styles.fecharmodalcont} onPress={() => setModalEditVisible(false)}>
               <Image
-
                 source={require("../../../assets/close.png")}
                 style={styles.x} />
             </Pressable>
@@ -412,9 +442,19 @@ export default function Remedios() {
                 <Text style={styles.label}>Descrição</Text>
                 <TextInput style={styles.inputmodal} value={desc} onChangeText={text => onChangeDesc(text)} />
               </View>
-              <View style={styles.continputmodal}>
+              <Pressable onPress={() => pegarData()} style={styles.continputmodal}>
                 <Text style={styles.label}>Horario de consumo</Text>
-                <TextInput style={styles.inputmodal} value={horario} onChangeText={text => onChangeHoriro(text)} />
+                <View style={[styles.inputmodal, {justifyContent: 'center'}]} >
+                  <Text style={{ color: '#000', paddingLeft: 10 }}>{horario || 'Selecione o horário'}</Text>
+                </View>
+              </Pressable> 
+              <View>
+              {mostrarModalHorario && (
+                <DateTimePicker mode="time"
+                  onChange={selecionarHorario}
+                  value={new Date()} 
+                />
+              )}
               </View>
               <View style={styles.continputmodal}>
                 <Text style={styles.label}>Dias de consumo</Text>

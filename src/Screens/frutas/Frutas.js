@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Text, View, Image, Alert,Modal,TouchableHighlight,FlatList, TextInput } from 'react-native';
 import styles from '../../styles/stylesComida.js';
 import { Pressable } from 'react-native';
-
+import colors from '../../color/color.js';
 import React, { useState, useEffect } from 'react';
 
 import NavComponent from '../../components/nav.js';
@@ -10,7 +10,7 @@ import NavComponent from '../../components/nav.js';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 // const API_URL = "https://trackapi.nutritionix.com/v2/natural/nutrients";
 
 
@@ -63,7 +63,10 @@ const navigation = useNavigation()
     <SafeAreaView style={styles.container}>
       <View style={styles.topo}>
       <View style={styles.titulo}>
-                          <Pressable  style={styles.voltarContainer} onPress={() => navigation.navigate("telaHome")}><Image source={require('../../../assets/setaEsquerda.png')} style={styles.imgsetaVoltar} /></Pressable>
+                          <Pressable  style={styles.voltarContainer} onPress={() => navigation.goBack()}>
+                                                    <FontAwesome5 name="arrow-left" size={24} color={colors.branco} />
+                            
+                            </Pressable>
                           <Text style={styles.tituloText}>Entenda sobre Frutas</Text>
       
                       

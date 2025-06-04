@@ -11,8 +11,7 @@ export default StyleSheet.create({
   titulo: {
     marginLeft: 5,
     flexDirection: "row",
-    gap: 60,
-    marginTop: 5,
+    gap: 100,
     alignItems: "center",
     padding: 10,
   },

@@ -15,12 +15,15 @@ export default function TabRoutes(){
         <Tab.Navigator 
         
         screenOptions={{headerShown: false,
-             tabBarStyle: {position: 'absolute', 
-                bottom: 0, width: '100%', height: 80,
+             tabBarStyle: {
+                 width: '100%', 
+                 height: 80,
+                borderTopColor: 'transparent',
                 backgroundColor: 'black',
-                backgroundColor: '#fff'},
-                tabBarIconStyle: { marginTop: 15},
-                tabBarActiveTintColor: 'red',
+                backgroundColor: '#fff'
+            },
+            tabBarIconStyle: { marginTop: 15},
+            tabBarActiveTintColor: 'red',
                  
         }}>
             <Tab.Screen 

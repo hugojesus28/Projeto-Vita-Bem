@@ -8,6 +8,7 @@ import colors from '../../color/color'
 import NavComponent from "../../components/nav"
 import { useNavigation } from "@react-navigation/native"
 import { SafeAreaView } from "react-native-safe-area-context"
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 export default function Imc() {
 
@@ -86,7 +87,9 @@ export default function Imc() {
             
             <View style={styles.topo_container}>
                 <View style={styles.titulo}>
-                    <Pressable  style={styles.voltarContainer} onPress={() => navigation.navigate("telaHome")}><Image source={require('../../../assets/setaEsquerda.png')} style={styles.imgsetaVoltar} /></Pressable>
+                    <Pressable  style={styles.voltarContainer} onPress={() => navigation.goBack()}>
+                        <FontAwesome5 name="arrow-left" size={24} color={colors.branco} />
+                    </Pressable>
                     <Text style={styles.tituloText}>Calcular seu IMC</Text>
 
                 </View>

@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import { Text, View, Image, TextInput, Pressable } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from '../../styles/stylesNotificacoes.js';
 import * as notifi from 'expo-notifications';
 import colors from '../../color/color.js'
 
-
+import * as Notifications from "expo-notifications";
 import { useNavigation } from '@react-navigation/native';
 export default function Notificacoes() {
   const [isFocus, setIsFocus] = useState(null);
@@ -16,7 +16,77 @@ export default function Notificacoes() {
   const removerFoco = () => {
     setIsFocus(null)
   }
+useEffect(() => {(
 
+	async() => {
+		const { status: notificationStatus } = await Notifications.requestPermissionsAsync();
+
+
+		if(notificationStatus !== 'granted');
+			Alert.alert('Permissão necessária', 'Ative as 	notificações para receber alertas.')
+
+		}
+
+  )();
+
+  }, []);
+
+  Notifications.setNotificationHandler({
+
+  handleNotification: async () => ({
+
+    shouldPlaySound: true,
+
+    shouldSetBadge: true,
+
+    shouldShowAlert: true,
+
+  }),
+
+});
+async function chamada() {
+
+	const { status } = await Notifications.getPermissionsAsync(); 
+
+
+
+if (status != "granted") { 
+
+	alert("não tem permissão"); 
+
+	return; 
+
+}
+await Notifications.scheduleNotificationAsync({
+
+	content: {
+
+		title: "Remedio",
+
+     body: "Não se esqueça de tomar seu remédio!",
+
+     vibrate: [0, 500, 200, 500],
+
+     data: {
+
+     		tipo: "lembrete",
+
+       	idRemedio: 28,
+
+        mensagem: "Tomar Remedio As 18h",
+
+     },
+
+	},
+
+   trigger: {
+
+   	seconds: 2,
+
+   },
+
+});
+}
   
   const navigation = useNavigation();
 
@@ -44,7 +114,7 @@ export default function Notificacoes() {
               </View>
             </View>
           </View>
-          <Pressable onPress={() => notificacao(1)}>
+          <Pressable onPress={() => chamada()}>
             <Text>Caba</Text>
           </Pressable>
         </View>
