@@ -1,7 +1,7 @@
 import styles from '../../styles/stylesVacinas';
 import color from '../../color/color';
 import { vacinasBrasil } from '../../objects/objVacinas';
-import { Pressable, View, Text, Image, FlatList, Modal } from 'react-native';
+import { Pressable, View, Text, Image, FlatList, Modal, ActivityIndicator } from 'react-native';
 import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -18,6 +18,8 @@ export default function Vacina(){
     const [bordaBox1, setBordaBox1] = useState(0)
     const [bordaBox2, setBordaBox2] = useState(0)
     const [bordaBox3, setBordaBox3] = useState(0)
+
+    const [carregando, setCarregando] = useState(false)
     console.log(lista)
     useEffect(() =>{
         console.log(categoriaAtual)

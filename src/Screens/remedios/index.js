@@ -9,7 +9,8 @@ import {
   FlatList,
   Modal,
   TextInput,
-  Alert
+  Alert,
+  ActivityIndicator
 } from "react-native";
 import { useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
@@ -108,6 +109,7 @@ export default function Remedios() {
     salvarBanco(Remedio)
   }
   async function salvarBanco(data) {
+    setCarregamento(true)
     try {
       
 
@@ -123,7 +125,6 @@ export default function Remedios() {
 
       listarRemedios(idUser);
       setCarregamento(false)
-      setModalVisible(false)
       console.log("remedio cadastrado"
       )
     } catch (error) {
@@ -147,7 +148,7 @@ export default function Remedios() {
     try{
       if(pesquisa.length >0){
         setCarregamento(true)
-        const resultados = await axios.get(`http://${global}:8000/api/remedioa/${pesquisa}`)
+        const resultados = await axios.get(`http://${global}:8000/api/remedioa/${pesquisa}/${idUser}`)
         setRemedios(resultados.data)
         setCarregamento(false)
 
@@ -188,6 +189,7 @@ export default function Remedios() {
   }
 
   const alterarRemedio = async () => {
+    setCarregamento(true)
     const Remedio = new FormData();
     try{
    if (image) {
@@ -261,7 +263,7 @@ export default function Remedios() {
     const resposta = axios.delete(`http://${global}:8000/api/remedio/${id}`);
     
     console.log(resposta)
-    listarRemedios();
+    listarRemedios(idUser);
 
   }
 
@@ -403,7 +405,14 @@ export default function Remedios() {
             </View>
             <View style={styles.Contcarregarimg}>
               <Pressable style={styles.carregarimg} onPress={() => salvar()}>
-                <Text style={styles.textbuttonmodal}>Salvar</Text>
+                {carregamento ? 
+                  (<ActivityIndicator 
+                    size={'large'}
+                    color={color.branco}
+                  />)
+                : 
+(                <Text style={styles.textbuttonmodal}>Salvar</Text>
+)                }
               </Pressable>
             </View>
           </View>
@@ -463,32 +472,20 @@ export default function Remedios() {
             </View>
             <View style={styles.Contcarregarimg}>
               <Pressable style={styles.carregarimg} onPress={() => alterarRemedio()}>
-                <Text style={styles.textbuttonmodal}>Salvar</Text>
-              </Pressable>
+              {carregamento ? 
+                 ( <ActivityIndicator 
+                    size={'large'}
+                    color={color.branco}
+                  />)
+                : 
+                (<Text style={styles.textbuttonmodal}>Salvar</Text>)
+                }
+                              </Pressable>
             </View>
           </View>
         </View>
       </Modal>
-            <Modal
-              animationType="fade"
-              transparent={true}
-              visible={carregamento}
-              onRequestClose={() => {
-                window.alert('Modal has been closed.');
-              }}>
-              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0000006d' }}>
-                <View>
-      
-      
-      
-      
-                  <Image
-                    source={{ uri: 'https://www.simondecyrene.org/wp-content/themes/simon-de-cyrene/assets/images/loader.gif' }}
-                    style={{ width: 100, height: 100 }}
-                  />
-                </View>
-              </View>
-            </Modal>
+            
     </SafeAreaView>
   );
 }

@@ -167,7 +167,7 @@ export default StyleSheet.create({
   fecharmodalcont:{
     width:'100%',
     alignItems:'end',
-    padding:15
+    padding:10
   },
   x:{
     width:20,
@@ -223,11 +223,11 @@ export default StyleSheet.create({
  
   },
   inputsModal:{
-    marginBottom:30,
+    marginBottom:20,
     gap:20,
     width:'100%',
     alignItems: 'center',
-    marginTop:35,
+    marginTop:20,
    
   },
   continputmodal:{

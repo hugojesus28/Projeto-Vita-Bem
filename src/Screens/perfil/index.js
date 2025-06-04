@@ -1,4 +1,4 @@
-import { Text, View, Image, TextInput, Pressable, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import { Text, View, Image, TextInput, Pressable, ScrollView, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import {  useEffect, useState } from 'react';
 import styles from '../../styles/stylesPerfil.js';
 import Icon from 'react-native-vector-icons/Feather';
@@ -13,6 +13,8 @@ import DropdownComponent from '../../components/dropdonws/DropdownDiabetico.js';
 import global from '../../../global.js';
 import DateTimePicker from 'react-native-ui-datepicker';
 import DropdownGenero from '../../components/dropdonws/DropdownGenero.js';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+
   import dayjs from 'dayjs';
   import 'dayjs/locale/pt-br';
 
@@ -29,7 +31,8 @@ export default function Perfil() {
   const [dataNasc, setDataNasc] = useState()
   const [hipertenso, setHipertenso] = useState()
   const [diabetico, setDiabetico] = useState()
-
+  const [carregando, setCarregando] = useState(false)
+  const [alert, setAlert] = useState(false)
   useEffect(() => {
     const pegarDados = async () => {
       const id = await AsyncStorage.getItem('idUser');
@@ -83,6 +86,8 @@ export default function Perfil() {
   }
 
   const atualizarUsuario = async () => {
+    setCarregando(true)
+
     const url = `http://${global}:8000/api/usuario/editar/${idUser}`;
     const usuario = new FormData()
     try{
@@ -133,7 +138,14 @@ export default function Perfil() {
       'Content-Type': 'multipart/form-data'
         }
       });
+      setCarregando(false)
     console.log(resposta)
+    if(resposta.data.sucesso){
+      setAlert(true)
+    }
+    setTimeout(() => {
+      setAlert(false)
+    }, [800])
    }
    catch(error){
     console.log(error)
@@ -321,7 +333,13 @@ export default function Perfil() {
             </View>
             <View style={{width: '100%', justifyContent: 'center', alignItems: 'center'}}>
           <Pressable style={[styles.botaoCadastrar]} onPress={() => atualizarUsuario()}>
-              <Text style={{ color: 'white', fontSize: 15, fontWeight: 700 }}>ALTERAR</Text>
+            {carregando ? 
+            (<ActivityIndicator size={'large' }color={color.branco} />)
+            :
+
+            (<Text style={{ color: 'white', fontSize: 15, fontWeight: 700 }}>ALTERAR</Text>)
+            }
+             
             </Pressable>
             </View>
           </ScrollView>
@@ -394,6 +412,15 @@ export default function Perfil() {
               </TouchableOpacity>
             </View>
           </View>
+        </View>
+      </Modal>
+      <Modal visible={alert} transparent={true} animationType='fade'>
+        <View style={{flex: 1}}>
+          <View style={{height: 50,position: 'absolute', bottom:20, left: 20, backgroundColor: color.verde, borderRadius: 20, width: '90%', flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center'
+           }}>
+                 <Text style={{color: color.branco, }}>Usuario Atualizado com Sucesso</Text>
+                <FontAwesome5 name='check-circle' size={24} color={color.branco}/>
+          </View> 
         </View>
       </Modal>
     </View>

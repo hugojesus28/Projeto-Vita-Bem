@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput, Pressable } from "react-native";
+import { View, Text, Image, TextInput, Pressable, ActivityIndicator } from "react-native";
 import styles from "../../styles/stylesCadastro";
 import color from "../../color/color";
 import { LinearGradient } from "expo-linear-gradient";
@@ -32,7 +32,7 @@ export default function Cadastro() {
   const totalEtapas = etapas.length;
 
   const EtapaComponente = etapas[etapaAtual];
-
+  const [carregando, setCarregando] = useState(false)
   const navigation = useNavigation();
 
 const cadastrar = async (dados) => {
@@ -77,14 +77,14 @@ const cadastrar = async (dados) => {
       usuario.append(key, value);
     });
 
-    console.log('Conteúdo do FormData:');
-    for (let [key, value] of usuario._parts) {
-      if (typeof value === 'object' && value.uri) {
-        console.log(key, `[Arquivo: ${value.name}]`);
-      } else {
-        console.log(key, value);
-      }
-    }
+    console.log('Conteúdo do FormData:', usuario);
+    // for (let [key, value] of usuario._parts) {
+    //   if (typeof value === 'object' && value.uri) {
+    //     console.log(key, `[Arquivo: ${value.name}]`);
+    //   } else {
+    //     console.log(key, value);
+    //   }
+    // }
 
     const resposta = await axios.post(`http://${global}:8000/api/usuario`, usuario, {
       headers: {

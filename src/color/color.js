@@ -5,7 +5,7 @@ const Colors = {
     transparente :"transparent",
     boxShadowPadrao: 'rgba(0, 0, 0, 0.25)',
     cinza: '#D9D9D9',
-    lowOpacity: 'rgba(0, 0, 0, 0.5)'
-
+    lowOpacity: 'rgba(0, 0, 0, 0.5)',
+    verde: '#2eb03f'
 };
 module.exports = Colors ;

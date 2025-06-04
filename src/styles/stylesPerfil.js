@@ -60,7 +60,6 @@ export default StyleSheet.create({
 
       viewInfoUsuario:{
         flex: 1,
-        
         width: '100%',
         marginBottom: 10,
       },

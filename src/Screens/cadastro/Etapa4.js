@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Button, Image, Pressable, Text, TextInput } from 'react-native';
+import { View, Button, Image, Pressable, Text, TextInput, ActivityIndicator } from 'react-native';
 import styles from '../../styles/stylesCadastro';
 import color from '../../color/color';
 import * as ImagePicker from 'expo-image-picker';
@@ -7,7 +7,7 @@ import * as FileSystem from 'expo-file-system';
 
 const Etapa3 = ({ onSubmit, onBack, formData }) => {
   const [imagem, setImagem] = useState(formData.imagem || null);
-
+  const [carregando, setCarregando] = useState(false)
   const escolherImagem = async () => {
   try {
     const resultado = await ImagePicker.launchImageLibraryAsync({
@@ -37,8 +37,19 @@ const Etapa3 = ({ onSubmit, onBack, formData }) => {
               <Text style={{color: 'white', fontSize: 15, fontWeight: 700}}>Escolher Imagem</Text>
             </Pressable>
               <View style={[styles.viewBotoes]}>
-                <Pressable style={[styles.botaoCadastrar]} onPress={() => onSubmit({imagem})} >
-                    <Text style={{color: 'white', fontSize: 15, fontWeight: 700}}>CONCLUIR</Text>
+                <Pressable style={[styles.botaoCadastrar]} onPress={() => {
+                  setCarregando(true)
+                  onSubmit({imagem})
+                  }} >
+                  {carregando ? 
+                  (<ActivityIndicator  
+                    size={'large'}
+                    color={color.branco}
+                  /> )
+                  :
+                  (<Text style={{color: 'white', fontSize: 15, fontWeight: 700}}>CONCLUIR</Text>)
+
+                }
                 </Pressable>
                 <Pressable style={[styles.botaoVoltar, styles.boxShadowInput]} onPress={() => onBack()} >
                     <Text style={{color: color.vermelhoFraco, fontSize: 15, fontWeight: 700}}>VOLTAR</Text>
