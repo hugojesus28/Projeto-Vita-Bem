@@ -15,7 +15,7 @@ import {
 import { useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { ScrollView } from "react-native";
-import global from "../../../global";
+import globalAndroid from "../../../global";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -114,7 +114,7 @@ export default function Remedios() {
       
 
 
-    const resposta = await axios.post(`http://${global}:8000/api/remedio`, data, {
+    const resposta = await axios.post(`http://${globalAndroid}:8000/api/remedio`, data, {
         headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -134,7 +134,7 @@ export default function Remedios() {
   async function listarRemedios(id) {
     try {
       console.log('id p user', id)
-      const resultados = await axios.get(`http://${global}:8000/api/remedio/${id}`);
+      const resultados = await axios.get(`http://${globalAndroid}:8000/api/remedio/${id}`);
       setCarregamento(false)
       
       setRemedios(resultados.data.remedios);
@@ -148,7 +148,7 @@ export default function Remedios() {
     try{
       if(pesquisa.length >0){
         setCarregamento(true)
-        const resultados = await axios.get(`http://${global}:8000/api/remedioa/${pesquisa}/${idUser}`)
+        const resultados = await axios.get(`http://${globalAndroid}:8000/api/remedioa/${pesquisa}/${idUser}`)
         setRemedios(resultados.data)
         setCarregamento(false)
 
@@ -239,7 +239,7 @@ export default function Remedios() {
 
     try{
       setCarregamento(true)
-    const resposta = await axios.post(`http://${global}:8000/api/remedio/${idRemedio}`, Remedio, {
+    const resposta = await axios.post(`http://${globalAndroid}:8000/api/remedio/${idRemedio}`, Remedio, {
         headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -260,7 +260,7 @@ export default function Remedios() {
   }
 
   const excluirRemedio = async (id) => {
-    const resposta = axios.delete(`http://${global}:8000/api/remedio/${id}`);
+    const resposta = axios.delete(`http://${globalAndroid}:8000/api/remedio/${id}`);
     
     console.log(resposta)
     listarRemedios(idUser);
@@ -319,7 +319,7 @@ export default function Remedios() {
             <View style={styles.card}>
               <View style={styles.imgCardCont}> 
                 <Image
-                source={ { uri: `http://${global}:8000/img/users/fotosRemedios/${item.img}` } }
+                source={ { uri: `http://${globalAndroid}:8000/img/users/fotosRemedios/${item.img}` } }
                 style={styles.imgCard}
               />
               </View>
@@ -433,7 +433,7 @@ export default function Remedios() {
             <View style={styles.boxcontimgModal}>
               <View style={styles.contimgModal}>
                 <Image
-                  source={isAlteracao ? { uri: `http://${global}:8000/img/users/fotosRemedios/${image}` } : { uri : image }}
+                  source={isAlteracao ? { uri: `http://${globalAndroid}:8000/img/users/fotosRemedios/${image}` } : { uri : image }}
                   style={styles.imgModal} />
               </View>
             </View>

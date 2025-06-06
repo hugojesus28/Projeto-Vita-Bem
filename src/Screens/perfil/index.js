@@ -10,7 +10,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DropdownHipertenso from '../../components/dropdonws/DropdownHipertenso.js';
 import DropdownComponent from '../../components/dropdonws/DropdownDiabetico.js';
-import global from '../../../global.js';
+import globalAndroid from '../../../global.js';
 import DateTimePicker from 'react-native-ui-datepicker';
 import DropdownGenero from '../../components/dropdonws/DropdownGenero.js';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
@@ -50,7 +50,7 @@ export default function Perfil() {
     setIsFocus(null)
   }
   useEffect(() =>{
-  axios.get(`http://${global}:8000/api/usuario/${idUser}`)
+  axios.get(`http://${globalAndroid}:8000/api/usuario/${idUser}`)
     .then(resposta =>{
       let usuario = resposta.data.usuario;
       console.log(usuario)
@@ -88,7 +88,7 @@ export default function Perfil() {
   const atualizarUsuario = async () => {
     setCarregando(true)
 
-    const url = `http://${global}:8000/api/usuario/editar/${idUser}`;
+    const url = `http://${globalAndroid}:8000/api/usuario/editar/${idUser}`;
     const usuario = new FormData()
     try{
 
@@ -131,7 +131,7 @@ export default function Perfil() {
           usuario.append('imgUsuario', null)
         }
     //console.log(usuario)
-    const resposta = await axios.post(`http://${global}:8000/api/usuario/${idUser}`, 
+    const resposta = await axios.post(`http://${globalAndroid}:8000/api/usuario/${idUser}`, 
       usuario, 
       {
         headers: {
@@ -210,7 +210,7 @@ export default function Perfil() {
         <View style={styles.viewLogo}>
           {imagem ? (
   <Image
-    source={{ uri: imagem.startsWith('file://') || imagem.startsWith('http') ? imagem : `http://${global}:8000/img/users/fotosUsers/${imagem}` }}
+    source={{ uri: imagem.startsWith('file://') || imagem.startsWith('http') ? imagem : `http://${globalAndroid}:8000/img/users/fotosUsers/${imagem}` }}
     style={{ width: '96%', height: '96%', borderRadius: 100, objectFit: 'cover' }}
   />
 ) : (

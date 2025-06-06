@@ -9,12 +9,12 @@ const { width } = Dimensions.get("window");
 const data = [
     { id: "1", title: "Remedios", image: require("../../assets/remedio.png") , caminho: 'remedios'}, 
     { id: "2", title: "Tomar agua", image: require("../../assets/garrafa-de-agua.png"), caminho: "telaAgua" },
-  { id: "3", title: "Medir Pressão", image: require("../../assets/pressao.png"), caminho:"telaPressao" },
+  { id: "3", title: "Pressão", image: require("../../assets/pressao.png"), caminho:"telaPressao" },
   { id: "4", title: "Frutas", image: require("../../assets/frutas.png") , caminho: "telaFrutas"},
   { id: "5", title: "IMC", image: require("../../assets/imc.png"), caminho: "telaImc"},
     { id: "6", title: "Vacinas", image: require("../../assets/vacinas.png") , caminho: "telaVacinas" },
   { id: "7", title: "Musicas", image: require("../../assets/musicas.png") },
-  { id: "9", title: "Medir Diabetes", image: require("../../assets/diabete.png"), caminho: "telaGlicemia" },
+  { id: "9", title: "Glicemia", image: require("../../assets/diabete.png"), caminho: "telaGlicemia" },
   { id: "10", title: "Dicas p/ Dormir", image: require("../../assets/dormindo.png") },
 
 ];

@@ -7,7 +7,7 @@ import { Alert } from "react-native";
 import { useNavigation,  useRoute } from "@react-navigation/native";
 import axios from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import global from "../../../global";
+import globalAndroid from "../../../global";
 
 export default function Login() {
   const [isFocus, setIsFocus] = useState(null);
@@ -37,7 +37,7 @@ export default function Login() {
   const logar = async () => {
     console.log('botao')
     await axios
-      .get(`http://${global}:8000/api/usuario/login/${email}`)
+      .get(`http://${globalAndroid}:8000/api/usuario/login/${email}`)
       .then((resposta) => {
         let usuario = resposta.data.dados;
         console.log(usuario);

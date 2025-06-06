@@ -29,7 +29,7 @@ export default StyleSheet.create({
     fontWeight: 500,
     color: colors.primeira,
   },
-   topo: {
+  topo: {
     width: "100%",
     flexDirection: "row",
     padding: 25,

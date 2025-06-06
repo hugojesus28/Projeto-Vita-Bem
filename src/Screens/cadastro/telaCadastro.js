@@ -10,7 +10,7 @@ import Etapa2 from "./Etapa2";
 import Etapa3 from "./Etapa3";
 import Etapa4 from "./Etapa4";
 import axios from "axios";
-import global from "../../../global";
+import globalAndroid from "../../../global";
 import * as FileSystem from 'expo-file-system';
 
 export default function Cadastro() {
@@ -86,7 +86,7 @@ const cadastrar = async (dados) => {
     //   }
     // }
 
-    const resposta = await axios.post(`http://${global}:8000/api/usuario`, usuario, {
+    const resposta = await axios.post(`http://${globalAndroid}:8000/api/usuario`, usuario, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

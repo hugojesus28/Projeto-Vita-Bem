@@ -10,7 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 
-import global from '../../../global.js';
+import globalAndroid from '../../../global.js';
 export default function Home() {
   const [idUser, setIdUser] = useState(null)
   const [nomeUser, setNomeUser] = useState('')
@@ -28,7 +28,7 @@ export default function Home() {
   
     useEffect(() =>{
       console.log(idUser)
-      axios.get(`http://${global}:8000/api/usuario/${idUser}`)
+      axios.get(`http://${globalAndroid}:8000/api/usuario/${idUser}`)
       .then(resposta =>{
         let user = resposta.data.usuario
         console.log(resposta)
