@@ -112,7 +112,7 @@ viewLinhaTopo:{
     paddingBottom:10,
   },
   listaCard: {
-  
+    flex: 1,
     width:'100%',
     alignItems:'center'
   },
@@ -263,13 +263,18 @@ viewLinhaTopo:{
   },
   inputmodal:{
     backgroundColor:colors.branco,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
     height:40,
     borderRadius:15,
+     paddingHorizontal: 10, // importante
+  qpaddingVertical: 5,    // importante para alinhar verticalmente o texto
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.4,
     shadowRadius: 5,
      elevation: 5,
-    backgroundColor: colors.branco
+    backgroundColor: colors.branco,
+    textAlignVertical: 'top'
   },
 });

@@ -21,25 +21,27 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import DateTimePicker from '@react-native-community/datetimepicker';
-
+import DropdownFiltro from "../../components/dropdonws/DropdownFiltros";
 export default function Pressao() {
   const [modalVisible, setModalVisible] = useState(false);
   const [carregamento, setCarregamento] = useState(false);
   const [modalEditVisible, setModalEditVisible] = useState(false);
   const [image, setImage] = useState(null);
   const [pesquisa, onChangePesquisa] = useState('');
-  const [nome, onChangeNome] = useState('');
-  const [desc, onChangeDesc] = useState('');
+  const [medida, onChangeMedida] = useState('');
+  const [dataMedida, onChangeDataMedida] = useState('');
   const [horario, onChangeHoriro] = useState('');
   const [dia, onChangeDia] = useState('');
-  const [remedios, setRemedios] = useState([]);
+  const [pressao, setPressao] = useState([]);
   const [idUser, setIdUser] = useState(null)
   const [isAlteracao, setIsAlteracao] = useState(false);
-  const [idRemedio, onChangeIdRemedio] = useState(null)
+  const [idPressao, onChangeIdPressao] = useState(null)
   const [mostrarModalHorario, setMostrarModalHorario] = useState(false);
+  const [filtro, setFiltro] = useState('');
+  const [observacao, onChangeObservacao] = useState('');
   const id = null;
 
-    const navigation = useNavigation()
+  const navigation = useNavigation()
   async function pickImage() {
     let result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
@@ -54,106 +56,100 @@ export default function Pressao() {
   }
   function salvar() {
 
-    const Remedio = new FormData();
-    try{
-    if (image) {
-      if (image.startsWith("data:image")) {
-        const base64Data = image.split(',')[1];
-        Remedio.append("imagemRemedio", {
-          uri: `data:image/jpeg;base64,${base64Data}`,
-          name: `foto_remedio_${Date.now()}.jpg`,
-          type: 'image/jpeg'
+    const Pressao = new FormData();
+    try {
+      if (image) {
+        if (image.startsWith("data:image")) {
+          const base64Data = image.split(',')[1];
+          Pressao.append("imgPressao", {
+            uri: `data:image/jpeg;base64,${base64Data}`,
+            name: `foto_Pressao_${Date.now()}.jpg`,
+            type: 'image/jpeg'
+          });
+        } else if (image.startsWith("file://")) {
+          Pressao.append("imgPressao", {
+            uri: image,
+            name: image.split('/').pop() || `foto_Pressao_${Date.now()}.jpg`,
+            type: 'image/jpeg'
+          });
+        }
+      }
+
+    } catch (error) {
+      console.error('Erro completo:', error);
+
+      if (error.response) {
+        console.error('Detalhes do erro:', {
+          status: error.response.status,
+          data: error.response.data,
+          headers: error.response.headers
         });
-      } else if (image.startsWith("file://")) {
-        Remedio.append("imagemRemedio", {
-          uri: image,
-          name: image.split('/').pop() || `foto_remedio_${Date.now()}.jpg`,
-          type: 'image/jpeg'
-        });
+        Alert.alert("Erro", error.response.data.message || "Falha no cadastro");
+      } else {
+        Alert.alert("Erro", "Não foi possível conectar ao servidor");
       }
     }
-
-
-
-  
-
-
-  } catch (error) {
-    console.error('Erro completo:', error);
-    
-    if (error.response) {
-      console.error('Detalhes do erro:', {
-        status: error.response.status,
-        data: error.response.data,
-        headers: error.response.headers
-      });
-      Alert.alert("Erro", error.response.data.message || "Falha no cadastro");
-    } else {
-      Alert.alert("Erro", "Não foi possível conectar ao servidor");
+    console.log(medida, horario, dataMedida, idUser)
+    const data = {
+      medidaPressao: medida,
+      horaPressao: horario,
+      dataPressao: dataMedida,
+      idUsuario: idUser,
+      observacao: observacao
     }
-  }
-  console.log(nome, desc, horario, dia, idUser)
-  const data = {
-    nome: nome,
-    horario: horario,
-    desc: desc,
-    dias: dia,
-    idUsuario: idUser,
-    termino: '2000-10-10',
-  }
-  Object.entries({...data}).forEach(([key, value]) => {
-      Remedio.append(key, value);
+    Object.entries({ ...data }).forEach(([key, value]) => {
+      Pressao.append(key, value);
     });
-    
-  console.log(Remedio)
-    salvarBanco(Remedio)
+
+    console.log(Pressao)
+    salvarBanco(Pressao)
   }
   async function salvarBanco(data) {
     setCarregamento(true)
     try {
-      
 
 
-    const resposta = await axios.post(`http://${globalAndroid}:8000/api/remedio`, data, {
+
+      const resposta = await axios.post(`http://${globalAndroid}:8000/api/pressao`, data, {
         headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      transformRequest: (data) => data,
+          'Content-Type': 'multipart/form-data',
+        },
+        transformRequest: (data) => data,
       });
 
       console.log('Resposta da API:', resposta);
 
-      listarRemedios(idUser);
+      listarPressao(idUser);
       setCarregamento(false)
+      setModalVisible(false)
       console.log("remedio cadastrado"
       )
     } catch (error) {
       console.log(error, '11')
     }
   }
-  async function listarRemedios(id) {
+  async function listarPressao(id) {
     try {
-      console.log('id p user', id)
-      const resultados = await axios.get(`http://${globalAndroid}:8000/api/remedio/${id}`);
+      setCarregamento(true)
+      const resultados = await axios.get(`http://${globalAndroid}:8000/api/pressao/${id}`);
       setCarregamento(false)
-      
-      setRemedios(resultados.data.remedios);
+      console.log(resultados.data)
+      setPressao(resultados.data.pressao);
 
-    } catch {
+    } catch (error) {
       return error
-      console.log(error)
     }
   }
   async function pesquisar() {
-    try{
-      if(pesquisa.length >0){
+    try {
+      if (pesquisa.length > 0) {
         setCarregamento(true)
-        const resultados = await axios.get(`http://${globalAndroid}:8000/api/remedioa/${pesquisa}/${idUser}`)
+        const resultados = await axios.get(`http://${globalAndroid}:8000/api/pressao/${pesquisa}/${idUser}`)
         setRemedios(resultados.data)
         setCarregamento(false)
 
       }
-    }catch{
+    } catch {
       return error
       console.log(error)
     }
@@ -165,90 +161,91 @@ export default function Pressao() {
         console.log('ID recuperado do AsyncStorage:', id);
         if (id) {
           await setIdUser(id);
-          await listarRemedios(id); 
+          await listarPressao(id);
         }
       } catch (error) {
         console.error('Erro ao carregar idUser:', error);
       }
     };
-    
+
     carregarIdUsuario();
   }, []);
 
   const abrirModalEdit = (id) => {
-    const remedioSelecionado = remedios.find((r) => r.id === id);
-    console.log(remedioSelecionado)
+    const pressaoSelecionado = pressao.find((r) => r.id === id);
+    console.log('Pressao selecionada:', pressaoSelecionado)
     setIsAlteracao(true)
+    onChangeMedida(pressaoSelecionado.medida_pressao);
+    onChangeDataMedida(pressaoSelecionado.data_pressao);
+    onChangeHoriro(pressaoSelecionado.horario_pressao);
+    onChangeObservacao(pressaoSelecionado.observacao);
+    onChangeIdPressao(pressaoSelecionado.id);
+    setImage(pressaoSelecionado.img_pressao);
     setModalEditVisible(true)
-    onChangeNome(remedioSelecionado.nome);
-    onChangeDesc(remedioSelecionado.desc);
-    onChangeHoriro(remedioSelecionado.horario);
-    onChangeDia(remedioSelecionado.termino);
-    onChangeIdRemedio(remedioSelecionado.id);
-    setImage(remedioSelecionado.img);
+
   }
 
-  const alterarRemedio = async () => {
+  const alterarPressao = async () => {
     setCarregamento(true)
-    const Remedio = new FormData();
-    try{
-   if (image) {
-  if (image.startsWith("data:image")) {
-    const base64Data = image.split(',')[1];
-    Remedio.append("imgRemedio", {
-      uri: `data:image/jpeg;base64,${base64Data}`,
-      name: `foto_remedio_${Date.now()}.jpg`,
-      type: 'image/jpeg'
-    });
-  } else if (image.startsWith("file://")) {
-    Remedio.append("imgRemedio", {
-      uri: image,
-      name: image.split('/').pop() || `foto_remedio_${Date.now()}.jpg`,
-      type: 'image/jpeg'
-    });
-  }
-}
-  } catch (error) {
-    console.error('Erro completo:', error);
-    
-    if (error.response) {
-      console.error('Detalhes do erro:', {
-        status: error.response.status,
-        data: error.response.data,
-        headers: error.response.headers
-      });
-      Alert.alert("Erro", error.response.data.message || "Falha no cadastro");
-    } else {
-      Alert.alert("Erro", "Não foi possível conectar ao servidor");
+    const Pressao = new FormData();
+    try {
+      if (image) {
+        if (image.startsWith("data:image")) {
+          const base64Data = image.split(',')[1];
+          Pressao.append("imgPressao", {
+            uri: `data:image/jpeg;base64,${base64Data}`,
+            name: `foto_Pressao_${Date.now()}.jpg`,
+            type: 'image/jpeg'
+          });
+        } else if (image.startsWith("file://")) {
+          Pressao.append("imgPressao", {
+            uri: image,
+            name: image.split('/').pop() || `foto_Pressao_${Date.now()}.jpg`,
+            type: 'image/jpeg'
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Erro completo:', error);
+
+      if (error.response) {
+        console.error('Detalhes do erro:', {
+          status: error.response.status,
+          data: error.response.data,
+          headers: error.response.headers
+        });
+        Alert.alert("Erro", error.response.data.message || "Falha no cadastro");
+      } else {
+        Alert.alert("Erro", "Não foi possível conectar ao servidor");
+      }
     }
-  }
-  console.log(nome, desc, horario, dia, idUser, idRemedio)
-  const data = {
-    nome: nome,
-    horario: horario,
-    desc: desc,
-    termino: '2000-10-10',
-    dias: dia,
-    idUsuario: idUser
-  }
-  Object.entries({...data}).forEach(([key, value]) => {
-      Remedio.append(key, value);
+    console.log(medida, dataMedida, horario, idUser, idPressao)
+    const data = {
+      medidaPressao: medida,
+      horarioPressao: horario,
+      dataPressao: dataMedida,
+      imgPressao: image,
+      observacao: observacao,
+      idUsuario: idUser
+    }
+    Object.entries({ ...data }).forEach(([key, value]) => {
+      Pressao.append(key, value);
     });
     console.log('id antes do update', idUser)
 
 
-    try{
+    try {
       setCarregamento(true)
-    const resposta = await axios.post(`http://${globalAndroid}:8000/api/remedio/${idRemedio}`, Remedio, {
+      const resposta = await axios.post(`http://${globalAndroid}:8000/api/pressao/${idPressao}`, Pressao, {
         headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      transformRequest: (data) => data,
+          'Content-Type': 'multipart/form-data',
+        },
+        transformRequest: (data) => data,
       });
 
-          console.log('Resposta da API:', resposta);
+      console.log('Resposta da API:', resposta);
 
-      listarRemedios(idUser);
+      listarPressao(idUser);
       setCarregamento(false)
       setModalEditVisible(false)
       console.log("remedio cadastrado"
@@ -256,14 +253,14 @@ export default function Pressao() {
     } catch (error) {
       console.log(error, '11')
     }
-    
+
   }
 
   const excluirRemedio = async (id) => {
-    const resposta = axios.delete(`http://${globalAndroid}:8000/api/remedio/${id}`);
-    
+    const resposta = axios.delete(`http://${globalAndroid}:8000/api/pressao/${id}`);
+
     console.log(resposta)
-    listarRemedios(idUser);
+    listarPressao(idUser);
 
   }
 
@@ -274,8 +271,27 @@ export default function Pressao() {
     setMostrarModalHorario(false);
   }
 
-  const pegarData = () =>{
+  const pegarData = () => {
     setMostrarModalHorario(true);
+  }
+
+  function filtrarItens(medidas, filtro) {
+    const copia = [...medidas];
+    console.log(copia)
+    switch (filtro) {
+      case 'rec':
+        return copia.sort((a, b) => {
+          const dataHoraA = new Date(`${a.data_pressao}T${a.hora_pressao}`);
+          const dataHoraB = new Date(`${b.data_pressao}T${b.hora_pressao}`);
+          return dataHoraB - dataHoraA;
+        });
+      case 'maior':
+        return copia.sort((a, b) => b.medida_pressao - a.medida_pressao);
+      case 'menor':
+        return copia.sort((a, b) => a.medida_pressao - b.medida_pressao);
+      default:
+        return medidas;
+    }
   }
   return (
     <SafeAreaView style={styles.container}>
@@ -290,19 +306,15 @@ export default function Pressao() {
         <Text style={styles.tituloText}>Pressão</Text>
       </View>
       <View style={styles.topo}>
-        <View style={styles.inputCont}>
-          <TextInput
-            style={styles.input}
-            placeholder="Nome do remedio"
-            onChangeText={text => onChangePesquisa(text)}
-          />
+        <View style={{width: '65%', height: 50}}>
+          <DropdownFiltro
+            valueFiltro={filtro}
+            onChangeFiltro={(f) => {
+              setFiltro(f);
+              setPressao(filtrarItens(pressao, f));
+            }} />
         </View>
-        <Pressable style={styles.mais} onPress={() => pesquisar()}>
-          <Image
-            source={require("../../../assets/lupav.png")}
-            style={styles.lupa}
-          />
-        </Pressable>
+        
         <Pressable style={styles.mais} onPress={() => setModalVisible(true)}>
           <Image
             source={require("../../../assets/mais.png")}
@@ -313,27 +325,27 @@ export default function Pressao() {
       <View style={styles.listaCard}>
 
         <View style={styles.viewHistorico}>
-                  <Text style={styles.textHistorico}>Historico de Medidas</Text>
-              </View>
-                <View style={styles.viewLinhaTopo}>
-              <View style={styles.linhaTopo}></View>
-              </View>
+          <Text style={styles.textHistorico}>Historico de Medidas</Text>
+        </View>
+        <View style={styles.viewLinhaTopo}>
+          <View style={styles.linhaTopo}></View>
+        </View>
         <FlatList
           style={styles.FlatList}
-          data={remedios}
+          data={pressao}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <View style={styles.card}>
-              <View style={styles.imgCardCont}> 
+              <View style={styles.imgCardCont}>
                 <Image
-                source={ { uri: `http://${globalAndroid}:8000/img/users/fotosRemedios/${item.img}` } }
-                style={styles.imgCard}
-              />
+                  source={{ uri: `http://${globalAndroid}:8000/img/users/fotosPressao/${item.img_pressao}` }}
+                  style={styles.imgCard}
+                />
               </View>
               <View style={styles.info}>
-                <Text style={styles.infoText}>Remédio: {item.nome}</Text>
-                <Text style={styles.infoText}>Hora de tomar: {item.horario}</Text>
-                <Text style={styles.infoText}>Descrição: {item.desc}</Text>
+                <Text style={styles.infoText}>Medida Pressão: {item.medida_pressao}</Text>
+                <Text style={styles.infoText}>Horario Medida: {item.hora_pressao}</Text>
+                <Text style={styles.infoText}>Observação: {item.observacao}</Text>
               </View>
               <View style={styles.acoes}>
                 <Pressable style={styles.acoesbutton} onPress={() => abrirModalEdit(item.id)}>
@@ -343,14 +355,14 @@ export default function Pressao() {
                   />
                 </Pressable>
 
-                 <Pressable style={styles.acoesbutton} onPress={() => excluirRemedio(item.id)}>
-                <FontAwesome5
-                  name="trash-alt"
-                  size={15}
-                  color={color.primeira}
-                  style={styles.acoesbuttonImg}
-                />
-            </Pressable> 
+                <Pressable style={styles.acoesbutton} onPress={() => excluirRemedio(item.id)}>
+                  <FontAwesome5
+                    name="trash-alt"
+                    size={15}
+                    color={color.primeira}
+                    style={styles.acoesbuttonImg}
+                  />
+                </Pressable>
               </View>
             </View>
           )} />
@@ -383,43 +395,24 @@ export default function Pressao() {
             </View>
             <View style={styles.inputsModal}>
               <View style={styles.continputmodal}>
-                <Text style={styles.label}>Nome do remédio</Text>
-                <TextInput style={styles.inputmodal} onChangeText={text => onChangeNome(text)} />
+                <Text style={styles.label}>Pressão Arterial(80mmHg)</Text>
+                <TextInput style={styles.inputmodal} onChangeText={text => onChangeMedida(text)} />
               </View>
               <View style={styles.continputmodal}>
-                <Text style={styles.label}>Descrição</Text>
-                <TextInput style={styles.inputmodal} onChangeText={text => onChangeDesc(text)} />
-              </View>
-              <Pressable onPress={() => pegarData()} style={styles.continputmodal}>
-                <Text style={styles.label}>Horario de consumo</Text>
-                <View style={[styles.inputmodal, {justifyContent: 'center'}]} >
-                  <Text style={{ color: '#000', paddingLeft: 10 }}>{horario || 'Selecione o horário'}</Text>
-                </View>
-              </Pressable> 
-              <View>
-              {mostrarModalHorario && (
-                <DateTimePicker mode="time"
-                  onChange={selecionarHorario}
-                  value={new Date()} 
-                />
-              )}
-              </View>
-             
-              <View style={styles.continputmodal}>
-                <Text style={styles.label}>Dias de consumo</Text>
-                <TextInput style={styles.inputmodal} onChangeText={text => onChangeDia(text)} />
+                <Text style={styles.label}>Observação(Opcional)</Text>
+                <TextInput style={[styles.inputmodal, { height: 150, textAlignVertical: 'top' }]} multiline={true} onChangeText={text => onChangeObservacao(text)} />
               </View>
             </View>
             <View style={styles.Contcarregarimg}>
               <Pressable style={styles.carregarimg} onPress={() => salvar()}>
-                {carregamento ? 
-                  (<ActivityIndicator 
+                {carregamento ?
+                  (<ActivityIndicator
                     size={'large'}
                     color={color.branco}
                   />)
-                : 
-(                <Text style={styles.textbuttonmodal}>Salvar</Text>
-)                }
+                  :
+                  (<Text style={styles.textbuttonmodal}>Salvar</Text>
+                  )}
               </Pressable>
             </View>
           </View>
@@ -440,7 +433,7 @@ export default function Pressao() {
             <View style={styles.boxcontimgModal}>
               <View style={styles.contimgModal}>
                 <Image
-                  source={isAlteracao ? { uri: `http://${globalAndroid}:8000/img/users/fotosRemedios/${image}` } : { uri : image }}
+                  source={isAlteracao ? { uri: `http://${globalAndroid}:8000/img/users/fotosPressao/${image}` } : { uri: image }}
                   style={styles.imgModal} />
               </View>
             </View>
@@ -451,48 +444,32 @@ export default function Pressao() {
             </View>
             <View style={styles.inputsModal}>
               <View style={styles.continputmodal}>
-                <Text style={styles.label}>Nome do remédio</Text>
-                <TextInput style={styles.inputmodal} value={nome} onChangeText={text => onChangeNome(text)} />
+                <Text style={styles.label}>Medida Pressão</Text>
+                <TextInput style={styles.inputmodal} keyboardType="numeric" value={medida.toString()} onChangeText={text => onChangeMedida(text)} />
               </View>
               <View style={styles.continputmodal}>
-                <Text style={styles.label}>Descrição</Text>
-                <TextInput style={styles.inputmodal} value={desc} onChangeText={text => onChangeDesc(text)} />
+                <Text style={styles.label}>Observação(Opcional)</Text>
+                <TextInput style={[styles.inputmodal, { height: 150, textAlignVertical: 'top' }]} multiline={true} value={observacao} onChangeText={text => onChangeObservacao(text)} />
               </View>
-              <Pressable onPress={() => pegarData()} style={styles.continputmodal}>
-                <Text style={styles.label}>Horario de consumo</Text>
-                <View style={[styles.inputmodal, {justifyContent: 'center'}]} >
-                  <Text style={{ color: '#000', paddingLeft: 10 }}>{horario || 'Selecione o horário'}</Text>
-                </View>
-              </Pressable> 
-              <View>
-              {mostrarModalHorario && (
-                <DateTimePicker mode="time"
-                  onChange={selecionarHorario}
-                  value={new Date()} 
-                />
-              )}
-              </View>
-              <View style={styles.continputmodal}>
-                <Text style={styles.label}>Dias de consumo</Text>
-                <TextInput style={styles.inputmodal} value={dia} onChangeText={text => onChangeDia(text)} />
-              </View>
+
+
             </View>
             <View style={styles.Contcarregarimg}>
-              <Pressable style={styles.carregarimg} onPress={() => alterarRemedio()}>
-              {carregamento ? 
-                 ( <ActivityIndicator 
+              <Pressable style={styles.carregarimg} onPress={() => alterarPressao()}>
+                {carregamento ?
+                  (<ActivityIndicator
                     size={'large'}
                     color={color.branco}
                   />)
-                : 
-                (<Text style={styles.textbuttonmodal}>Salvar</Text>)
+                  :
+                  (<Text style={styles.textbuttonmodal}>Salvar</Text>)
                 }
-                              </Pressable>
+              </Pressable>
             </View>
           </View>
         </View>
       </Modal>
-            
+
     </SafeAreaView>
   );
 }

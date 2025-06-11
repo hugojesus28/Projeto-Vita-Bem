@@ -21,23 +21,45 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import Vi from "dayjs/locale/vi";
-
+import DropdownFiltro from "../../components/dropdonws/DropdownFiltros";
 export default function Glicemia() {
   const [modalVisible, setModalVisible] = useState(false);
   const [carregamento, setCarregamento] = useState(false);
   const [modalEditVisible, setModalEditVisible] = useState(false);
   const [image, setImage] = useState(null);
   const [pesquisa, onChangePesquisa] = useState('');
-  const [nome, onChangeNome] = useState('');
-  const [desc, onChangeDesc] = useState('');
+  const [medidaGlicose, onChangemedidaGlicose] = useState('');
+  const [observacao, onChangeObservacao] = useState('');
   const [horario, onChangeHoriro] = useState('');
   const [dia, onChangeDia] = useState('');
-  const [remedios, setRemedios] = useState([]);
+  const [glicemia, setGlicemia] = useState([]);
   const [idUser, setIdUser] = useState(null)
   const [isAlteracao, setIsAlteracao] = useState(false);
-  const [idRemedio, onChangeIdRemedio] = useState(null)
+  const [idGlicemia, onChangeIdGlicemia] = useState(null)
   const [mostrarModalHorario, setMostrarModalHorario] = useState(false);
+  const [dataSelecionada, setDataSelecionada] = useState(new Date());
+  const [filtro, setFiltro] = useState('');
+
+
+  function filtrarItens(medidas, filtro) {
+    const copia = [...medidas];
+    console.log(copia)
+    switch (filtro) {
+      case 'rec':
+        return copia.sort((a, b) => {
+          const dataHoraA = new Date(`${a.data_registro}T${a.horario_registro}`);
+          const dataHoraB = new Date(`${b.data_registro}T${b.horario_registro}`);
+          return dataHoraB - dataHoraA;
+        });
+      case 'maior':
+        return copia.sort((a, b) => b.nivel_glicose - a.nivel_glicose);
+      case 'menor':
+        return copia.sort((a, b) => a.nivel_glicose - b.nivel_glicose);
+      default:
+        return medidas;
+    }
+  }
+
   const id = null;
 
     const navigation = useNavigation()
@@ -55,20 +77,20 @@ export default function Glicemia() {
   }
   function salvar() {
 
-    const Remedio = new FormData();
+    const glicemia = new FormData();
     try{
     if (image) {
       if (image.startsWith("data:image")) {
         const base64Data = image.split(',')[1];
-        Remedio.append("imagemRemedio", {
+        glicemia.append("imgGlicemia", {
           uri: `data:image/jpeg;base64,${base64Data}`,
-          name: `foto_remedio_${Date.now()}.jpg`,
+          name: `foto_glicemia_${Date.now()}.jpg`,
           type: 'image/jpeg'
         });
       } else if (image.startsWith("file://")) {
-        Remedio.append("imagemRemedio", {
+        glicemia.append("imgGlicemia", {
           uri: image,
-          name: image.split('/').pop() || `foto_remedio_${Date.now()}.jpg`,
+          name: image.split('/').pop() || `foto_glicemia_${Date.now()}.jpg`,
           type: 'image/jpeg'
         });
       }
@@ -93,52 +115,54 @@ export default function Glicemia() {
       Alert.alert("Erro", "Não foi possível conectar ao servidor");
     }
   }
-  console.log(nome, desc, horario, dia, idUser)
+  console.log(idUser, dataSelecionada, medidaGlicose, observacao)
   const data = {
-    nome: nome,
-    horario: horario,
-    desc: desc,
-    dias: dia,
     idUsuario: idUser,
-    termino: '2000-10-10',
+    dataRegistro: dataSelecionada,
+    nivelGlicose: medidaGlicose,
+    observacao: observacao,
+   
   }
   Object.entries({...data}).forEach(([key, value]) => {
-      Remedio.append(key, value);
+      glicemia.append(key, value);
     });
     
-  console.log(Remedio)
-    salvarBanco(Remedio)
+  console.log(glicemia)
+    salvarBanco(glicemia)
   }
+
   async function salvarBanco(data) {
     setCarregamento(true)
+    console.log(globalAndroid)
     try {
       
-
-
-    const resposta = await axios.post(`http://${globalAndroid}:8000/api/remedio`, data, {
+      console.log(data instanceof FormData); // deve ser true
+      const url = `http://${globalAndroid}:8000/api/diabete`;
+      console.log('URL da API:', url);
+    const resposta = await axios.post(`http://${globalAndroid}:8000/api/diabete`, data, {
         headers: {
         'Content-Type': 'multipart/form-data',
       },
-      transformRequest: (data) => data,
       });
 
       console.log('Resposta da API:', resposta);
 
-      listarRemedios(idUser);
+      listarGlicemia(idUser);
       setCarregamento(false)
       console.log("remedio cadastrado"
       )
     } catch (error) {
+      setCarregamento(false)
       console.log(error, '11')
     }
   }
-  async function listarRemedios(id) {
+  async function listarGlicemia(id) {
     try {
       console.log('id p user', id)
-      const resultados = await axios.get(`http://${globalAndroid}:8000/api/remedio/${id}`);
+      const resultados = await axios.get(`http://${globalAndroid}:8000/api/diabete/${id}`);
       setCarregamento(false)
       
-      setRemedios(resultados.data.remedios);
+      setGlicemia(resultados.data.diabete);
 
     } catch {
       return error
@@ -149,8 +173,8 @@ export default function Glicemia() {
     try{
       if(pesquisa.length >0){
         setCarregamento(true)
-        const resultados = await axios.get(`http://${globalAndroid}:8000/api/remedioa/${pesquisa}/${idUser}`)
-        setRemedios(resultados.data)
+        const resultados = await axios.get(`http://${globalAndroid}:8000/api/glicemia/${pesquisa}/${idUser}`)
+        setGlicemia(resultados.data)
         setCarregamento(false)
 
       }
@@ -166,7 +190,7 @@ export default function Glicemia() {
         console.log('ID recuperado do AsyncStorage:', id);
         if (id) {
           await setIdUser(id);
-          await listarRemedios(id); 
+          await listarGlicemia(id); 
         }
       } catch (error) {
         console.error('Erro ao carregar idUser:', error);
@@ -175,36 +199,37 @@ export default function Glicemia() {
     
     carregarIdUsuario();
   }, []);
+        console.log(globalAndroid)
 
   const abrirModalEdit = (id) => {
-    const remedioSelecionado = remedios.find((r) => r.id === id);
-    console.log(remedioSelecionado)
+    const glicemiaSelecionado = glicemia.find((r) => r.id === id);
+    console.log(glicemiaSelecionado)
     setIsAlteracao(true)
     setModalEditVisible(true)
-    onChangeNome(remedioSelecionado.nome);
-    onChangeDesc(remedioSelecionado.desc);
-    onChangeHoriro(remedioSelecionado.horario);
-    onChangeDia(remedioSelecionado.termino);
-    onChangeIdRemedio(remedioSelecionado.id);
-    setImage(remedioSelecionado.img);
+    onChangemedidaGlicose(glicemiaSelecionado.nivel_glicose);
+    onChangeObservacao(glicemiaSelecionado.observacao);
+    onChangeHoriro(glicemiaSelecionado.horario_registro);
+    onChangeDia(glicemiaSelecionado.termino);
+    onChangeIdGlicemia(glicemiaSelecionado.id);
+    setImage(glicemiaSelecionado.img_glicose);
   }
 
   const alterarRemedio = async () => {
     setCarregamento(true)
-    const Remedio = new FormData();
+    const glicemia = new FormData();
     try{
    if (image) {
   if (image.startsWith("data:image")) {
     const base64Data = image.split(',')[1];
-    Remedio.append("imgRemedio", {
+    glicemia.append("imgGlicemia", {
       uri: `data:image/jpeg;base64,${base64Data}`,
-      name: `foto_remedio_${Date.now()}.jpg`,
+      name: `foto_glicemia_${Date.now()}.jpg`,
       type: 'image/jpeg'
     });
   } else if (image.startsWith("file://")) {
-    Remedio.append("imgRemedio", {
+    glicemia.append("imgGlicemia", {
       uri: image,
-      name: image.split('/').pop() || `foto_remedio_${Date.now()}.jpg`,
+      name: image.split('/').pop() || `foto_glicemia_${Date.now()}.jpg`,
       type: 'image/jpeg'
     });
   }
@@ -223,24 +248,22 @@ export default function Glicemia() {
       Alert.alert("Erro", "Não foi possível conectar ao servidor");
     }
   }
-  console.log(nome, desc, horario, dia, idUser, idRemedio)
+  console.log('medida criada ',medidaGlicose, observacao, horario, dia, idUser, idGlicemia)
   const data = {
-    nome: nome,
-    horario: horario,
-    desc: desc,
-    termino: '2000-10-10',
-    dias: dia,
-    idUsuario: idUser
+    nivelGlicose: medidaGlicose,
+    idUsuario: idUser,
+    observacao: observacao,
+    dataRegistro: dataSelecionada,
   }
   Object.entries({...data}).forEach(([key, value]) => {
-      Remedio.append(key, value);
+      glicemia.append(key, value);
     });
     console.log('id antes do update', idUser)
 
 
     try{
       setCarregamento(true)
-    const resposta = await axios.post(`http://${globalAndroid}:8000/api/remedio/${idRemedio}`, Remedio, {
+    const resposta = await axios.post(`http://${globalAndroid}:8000/api/diabete/${idGlicemia}`, glicemia, {
         headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -249,7 +272,7 @@ export default function Glicemia() {
 
           console.log('Resposta da API:', resposta);
 
-      listarRemedios(idUser);
+      listarGlicemia(idUser);
       setCarregamento(false)
       setModalEditVisible(false)
       console.log("remedio cadastrado"
@@ -260,11 +283,11 @@ export default function Glicemia() {
     
   }
 
-  const excluirRemedio = async (id) => {
-    const resposta = axios.delete(`http://${globalAndroid}:8000/api/remedio/${id}`);
+  const excluirGlicemia = async (id) => {
+    const resposta = axios.delete(`http://${globalAndroid}:8000/api/diabete/${id}`);
     
     console.log(resposta)
-    listarRemedios(idUser);
+    listarGlicemia(idUser);
 
   }
 
@@ -291,19 +314,14 @@ export default function Glicemia() {
         <Text style={styles.tituloText}>Glicemia</Text>
       </View>
       <View style={styles.topo}>
-        <View style={styles.inputCont}>
-          <TextInput
-            style={styles.input}
-            placeholder="Nome do remedio"
-            onChangeText={text => onChangePesquisa(text)}
-          />
+        <View style={{width: '65%', height: 50}}>
+          <DropdownFiltro
+            valueFiltro={filtro}
+            onChangeFiltro={(f) => {
+              setFiltro(f);
+              setGlicemia(filtrarItens(glicemia, f));
+            }} />
         </View>
-        <Pressable style={styles.mais} onPress={() => pesquisar()}>
-          <Image
-            source={require("../../../assets/lupav.png")}
-            style={styles.lupa}
-          />
-        </Pressable>
         <Pressable style={styles.mais} onPress={() => setModalVisible(true)}>
           <Image
             source={require("../../../assets/mais.png")}
@@ -323,20 +341,21 @@ export default function Glicemia() {
       </View>
         <FlatList
           style={styles.FlatList}
-          data={remedios}
+          data={glicemia}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <View style={styles.card}>
               <View style={styles.imgCardCont}> 
                 <Image
-                source={ { uri: `http://${globalAndroid}:8000/img/users/fotosRemedios/${item.img}` } }
+                source={ { uri: `http://${globalAndroid}:8000/img/users/fotosGlicose/${item.img_glicose}` } }
                 style={styles.imgCard}
               />
               </View>
               <View style={styles.info}>
-                <Text style={styles.infoText}>Remédio: {item.nome}</Text>
-                <Text style={styles.infoText}>Hora de tomar: {item.horario}</Text>
-                <Text style={styles.infoText}>Descrição: {item.desc}</Text>
+                <Text style={styles.infoText}>Medida Glicemia: {item.nivel_glicose}</Text>
+                <Text style={styles.infoText}>Horario Medida: {item.horario_registro}</Text>
+                <Text style={styles.infoText}>Observação: {item.observacao}</Text>
+
               </View>
               <View style={styles.acoes}>
                 <Pressable style={styles.acoesbutton} onPress={() => abrirModalEdit(item.id)}>
@@ -346,7 +365,7 @@ export default function Glicemia() {
                   />
                 </Pressable>
 
-                 <Pressable style={styles.acoesbutton} onPress={() => excluirRemedio(item.id)}>
+                 <Pressable style={styles.acoesbutton} onPress={() => excluirGlicemia(item.id)}>
                 <FontAwesome5
                   name="trash-alt"
                   size={15}
@@ -386,31 +405,13 @@ export default function Glicemia() {
             </View>
             <View style={styles.inputsModal}>
               <View style={styles.continputmodal}>
-                <Text style={styles.label}>Nome do remédio</Text>
-                <TextInput style={styles.inputmodal} onChangeText={text => onChangeNome(text)} />
+                <Text style={styles.label}>Medida Glicemia</Text>
+                <TextInput style={styles.inputmodal} onChangeText={text => onChangemedidaGlicose(text)} />
               </View>
+
               <View style={styles.continputmodal}>
-                <Text style={styles.label}>Descrição</Text>
-                <TextInput style={styles.inputmodal} onChangeText={text => onChangeDesc(text)} />
-              </View>
-              <Pressable onPress={() => pegarData()} style={styles.continputmodal}>
-                <Text style={styles.label}>Horario de consumo</Text>
-                <View style={[styles.inputmodal, {justifyContent: 'center'}]} >
-                  <Text style={{ color: '#000', paddingLeft: 10 }}>{horario || 'Selecione o horário'}</Text>
-                </View>
-              </Pressable> 
-              <View>
-              {mostrarModalHorario && (
-                <DateTimePicker mode="time"
-                  onChange={selecionarHorario}
-                  value={new Date()} 
-                />
-              )}
-              </View>
-             
-              <View style={styles.continputmodal}>
-                <Text style={styles.label}>Dias de consumo</Text>
-                <TextInput style={styles.inputmodal} onChangeText={text => onChangeDia(text)} />
+                <Text style={styles.label}>Observação(Opcional)</Text>
+                <TextInput style={[styles.inputmodal, {height: 150 }]} onChangeText={text => onChangeObservacao(text)} />
               </View>
             </View>
             <View style={styles.Contcarregarimg}>
@@ -443,7 +444,7 @@ export default function Glicemia() {
             <View style={styles.boxcontimgModal}>
               <View style={styles.contimgModal}>
                 <Image
-                  source={isAlteracao ? { uri: `http://${globalAndroid}:8000/img/users/fotosRemedios/${image}` } : { uri : image }}
+                  source={isAlteracao ? { uri: `http://${globalAndroid}:8000/img/users/fotosGlicose/${image}` } : { uri : image }}
                   style={styles.imgModal} />
               </View>
             </View>
@@ -454,30 +455,13 @@ export default function Glicemia() {
             </View>
             <View style={styles.inputsModal}>
               <View style={styles.continputmodal}>
-                <Text style={styles.label}>Nome do remédio</Text>
-                <TextInput style={styles.inputmodal} value={nome} onChangeText={text => onChangeNome(text)} />
+                <Text style={styles.label}>Medida Glicemia</Text>
+                <TextInput style={styles.inputmodal} value={medidaGlicose.toString()} onChangeText={text => onChangemedidaGlicose(text)} />
               </View>
+              
               <View style={styles.continputmodal}>
-                <Text style={styles.label}>Descrição</Text>
-                <TextInput style={styles.inputmodal} value={desc} onChangeText={text => onChangeDesc(text)} />
-              </View>
-              <Pressable onPress={() => pegarData()} style={styles.continputmodal}>
-                <Text style={styles.label}>Horario de consumo</Text>
-                <View style={[styles.inputmodal, {justifyContent: 'center'}]} >
-                  <Text style={{ color: '#000', paddingLeft: 10 }}>{horario || 'Selecione o horário'}</Text>
-                </View>
-              </Pressable> 
-              <View>
-              {mostrarModalHorario && (
-                <DateTimePicker mode="time"
-                  onChange={selecionarHorario}
-                  value={new Date()} 
-                />
-              )}
-              </View>
-              <View style={styles.continputmodal}>
-                <Text style={styles.label}>Dias de consumo</Text>
-                <TextInput style={styles.inputmodal} value={dia} onChangeText={text => onChangeDia(text)} />
+                <Text style={[styles.label, ]}>Observação(Opcional)</Text>
+                <TextInput style={[styles.inputmodal, {height: 150, }]} value={observacao}   multiline={true} onChangeText={text => onChangeObservacao(text)} />
               </View>
             </View>
             <View style={styles.Contcarregarimg}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,  } from "react";
 import { View, Text, Image, Dimensions, StyleSheet, Animated, Pressable } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import color from '../color/color';
@@ -13,9 +13,9 @@ const data = [
   { id: "4", title: "Frutas", image: require("../../assets/frutas.png") , caminho: "telaFrutas"},
   { id: "5", title: "IMC", image: require("../../assets/imc.png"), caminho: "telaImc"},
     { id: "6", title: "Vacinas", image: require("../../assets/vacinas.png") , caminho: "telaVacinas" },
-  { id: "7", title: "Musicas", image: require("../../assets/musicas.png") },
+  { id: "7", title: "Musicas", image: require("../../assets/musicas.png"), caminho: 'telaMusicas' },
   { id: "9", title: "Glicemia", image: require("../../assets/diabete.png"), caminho: "telaGlicemia" },
-  { id: "10", title: "Dicas p/ Dormir", image: require("../../assets/dormindo.png") },
+  { id: "10", title: "Dicas p/ Dormir", image: require("../../assets/dormindo.png"), caminho: 'telaSono' },
 
 ];
 

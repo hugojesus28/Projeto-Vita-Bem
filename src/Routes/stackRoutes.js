@@ -13,8 +13,9 @@ import Splash from "../Screens/splash/splash";
 import Agua from '../Screens/agua';
 import Glicemia from "../Screens/glicemia";
 import Remedios from '../Screens/remedios';
-
-
+import Mensagens from "../Screens/mensagens";
+import Musicas from '../Screens/musicas';
+import Sono from '../Screens/sono';
 const Stack = createNativeStackNavigator()
 
 export default function StackRoutes(){
@@ -23,6 +24,12 @@ export default function StackRoutes(){
 
             <Stack.Navigator>
                 <Stack.Screen name="telaSplash" component={Splash}
+                options={{headerShown: false}}
+                />
+                 <Stack.Screen name="telaSono" component={Sono}
+                options={{headerShown: false}}
+                />
+                <Stack.Screen name="telaMusicas" component={Musicas}
                 options={{headerShown: false}}
                 />
                 <Stack.Screen
@@ -50,7 +57,9 @@ export default function StackRoutes(){
                 <Stack.Screen name="telaGlicemia" component={Glicemia}
                 options={{headerShown: false}}
                 />
-
+<Stack.Screen name="telaMensagens" component={Mensagens}
+                options={{headerShown: false}}
+                />
                  
                 
             

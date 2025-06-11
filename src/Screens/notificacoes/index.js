@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Text, View, Image, TextInput, Pressable } from 'react-native';
+import { Text, View, Image, TextInput, Pressable, TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
 import styles from '../../styles/stylesNotificacoes.js';
 import * as notifi from 'expo-notifications';
@@ -99,7 +99,7 @@ await Notifications.scheduleNotificationAsync({
       <View style={styles.container_fundoHome}>
         <View style={styles.viewInfoUsuario}>
           <View style={styles.boxNotificacao}>
-            <View style={styles.conteudoNotificacao}>
+            <TouchableOpacity style={styles.conteudoNotificacao} onPress={() => chamada()}>
               <View style={styles.viewImagem}>
                 <Image style={{objectFit: 'cover', width: '100%', height: '100%', borderRadius: 30}} source={require('../../../assets/imgUsuario/podpah.jpeg')} />
               </View>
@@ -112,11 +112,9 @@ await Notifications.scheduleNotificationAsync({
                 <Text style={{color:colors.cinza}}>12/07/2025 </Text>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           </View>
-          <Pressable onPress={() => chamada()}>
-            <Text>Caba</Text>
-          </Pressable>
+          
         </View>
 
       </View>

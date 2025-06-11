@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput, Pressable } from "react-native";
+import { View, Text, Image, TextInput, Pressable, ActivityIndicator } from "react-native";
 import styles from "../../styles/stylesLogin";
 import color from "../../color/color";
 import { LinearGradient } from "expo-linear-gradient";
@@ -23,6 +23,7 @@ export default function Login() {
   const [email, setEmail] = useState();
   const [senha, setSenha] = useState();
   const [confirmSenha, setConfirmSenha] = useState();
+  const [carregando, setCarregando] = useState(false)
 
   const navigation = useNavigation();
   const route = useRoute();
@@ -36,6 +37,7 @@ export default function Login() {
 
   const logar = async () => {
     console.log('botao')
+    setCarregando(true)
     await axios
       .get(`http://${globalAndroid}:8000/api/usuario/login/${email}`)
       .then((resposta) => {
@@ -43,6 +45,8 @@ export default function Login() {
         console.log(usuario);
         console.log(email);
         if (email === usuario.email_usuario && senha === usuario.senha_usuario && confirmSenha === senha) {
+                  setCarregando(false)
+
           console.log("logado em: ", String(usuario.id));
           AsyncStorage.setItem('idUser', String(usuario.id))
           AsyncStorage.setItem('logado', '1')
@@ -120,9 +124,15 @@ export default function Login() {
           </View>
 
           <Pressable style={styles.botaoCadastrar} onPress={() => logar()}>
-            <Text style={{ color: "white", fontSize: 15, fontWeight: 700 }}>
+            {carregando ?(
+            
+              <ActivityIndicator size={'large'} color={color.branco} />
+              
+            ):(
+              <Text style={{ color: "white", fontSize: 15, fontWeight: 700 }}>
               LOGAR
             </Text>
+            )}
           </Pressable>
           <Pressable onPress={() => navigation.navigate("telaCadastro")}>
             <Text style={styles.textAlternarForm}>Cadastro</Text>
